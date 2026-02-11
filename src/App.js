@@ -15,6 +15,7 @@ import Profile from "./components/Profile";
 import TotalPage from "./components/TotalPage";
 import BalancesPage from "./components/BalancesPage";
 import MembersPage from "./components/MembersPage";
+import ChartsPage from "./components/ChartsPage";
 import ExportPage from "./components/ExportPage";
 import { Button } from "./components/ui/button";
 import { cn } from "./lib/utils";
@@ -40,6 +41,8 @@ const MainContent = () => {
       return <BalancesPage />;
     case "membersPage":
       return <MembersPage />;
+    case "chartsPage":
+      return <ChartsPage />;
     case "exportPage":
       return <ExportPage />;
     default:

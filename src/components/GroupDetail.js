@@ -1,6 +1,6 @@
 // components/GroupDetail.js
 import React, { useState } from "react";
-import { ArrowLeft, Settings, Users, Plus, Calculator, DollarSign, User, Download } from "lucide-react";
+import { ArrowLeft, Settings, Users, Plus, Calculator, DollarSign, User, Download, BarChart3 } from "lucide-react";
 import { useAppContext } from "../contexts/AppContext";
 import TransactionsTab from "./tabs/TransactionsTab";
 import { Button } from "./ui/button";
@@ -62,6 +62,7 @@ const GroupDetail = () => {
     { key: "total", label: "Total", icon: DollarSign, page: "totalPage" },
     { key: "balances", label: "Balances", icon: Calculator, page: "balancesPage" },
     { key: "members", label: "Members", icon: User, page: "membersPage" },
+    { key: "charts", label: "Charts", icon: BarChart3, page: "chartsPage" },
     { key: "export", label: "Export", icon: Download, page: "exportPage" },
   ];
 
