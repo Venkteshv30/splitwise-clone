@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Layout, Spin, Button } from "antd";
-import { MenuOutlined, LogoutOutlined, TeamOutlined } from "@ant-design/icons";
+import { Menu, LogOut, Users, Loader2 } from "lucide-react";
 import { AppProvider, useAppContext } from "./contexts/AppContext";
 import { signOut } from "firebase/auth";
 import { auth } from "./firebase";
@@ -12,8 +11,8 @@ import CreateGroup from "./components/CreateGroup";
 import GroupDetail from "./components/GroupDetail";
 import AddExpense from "./components/AddExpense";
 import Profile from "./components/Profile";
-
-const { Sider, Content } = Layout;
+import { Button } from "./components/ui/button";
+import { cn } from "./lib/utils";
 
 // Main Content Router Component
 const MainContent = () => {
@@ -38,40 +37,46 @@ const MainContent = () => {
 // Icon Sidebar Component
 const IconSidebar = ({ onExpandClick, onLogout }) => {
   return (
-    <div className="fixed left-0 top-0 h-full w-16 bg-blue-600 shadow-lg z-50 flex flex-col">
+    <div className="fixed left-0 top-0 h-full w-16 bg-card border-r border-border shadow-lg z-50 flex flex-col">
       {/* Logo/Brand */}
-      <div className="h-16 flex items-center justify-center border-b border-blue-500">
-        <span className="text-white text-xl">💰</span>
+      <div className="h-16 flex items-center justify-center border-b border-border">
+        <span className="text-foreground text-xl">💰</span>
       </div>
 
       {/* Menu Items */}
       <div className="flex-1 flex flex-col items-center py-4 space-y-4">
         <Button
-          type="text"
-          icon={<MenuOutlined />}
+          variant="ghost"
+          size="icon"
           onClick={onExpandClick}
-          className="text-white hover:bg-blue-500 w-10 h-10 flex items-center justify-center"
+          className="text-foreground hover:bg-accent w-10 h-10"
           title="Open Menu"
-        />
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
 
         <Button
-          type="text"
-          icon={<TeamOutlined />}
+          variant="ghost"
+          size="icon"
           onClick={onExpandClick}
-          className="text-white hover:bg-blue-500 w-10 h-10 flex items-center justify-center"
+          className="text-foreground hover:bg-accent w-10 h-10"
           title="Groups"
-        />
+        >
+          <Users className="h-5 w-5" />
+        </Button>
       </div>
 
       {/* Logout */}
       <div className="p-2">
         <Button
-          type="text"
-          icon={<LogoutOutlined />}
+          variant="ghost"
+          size="icon"
           onClick={onLogout}
-          className="text-white hover:bg-red-500 w-10 h-10 flex items-center justify-center"
+          className="text-destructive hover:bg-destructive/10 w-10 h-10"
           title="Logout"
-        />
+        >
+          <LogOut className="h-5 w-5" />
+        </Button>
       </div>
     </div>
   );
@@ -84,8 +89,8 @@ const AppLayout = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Spin size="large" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -111,7 +116,7 @@ const AppLayout = () => {
   };
 
   return (
-    <Layout className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Icon Sidebar - Desktop only */}
       <div className="hidden md:block">
         <IconSidebar
@@ -126,12 +131,12 @@ const AppLayout = () => {
           <>
             {/* Overlay */}
             <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-40"
+              className="fixed inset-0 bg-black/50 z-40"
               onClick={handleCollapseSidebar}
             />
 
             {/* Full Sidebar */}
-            <div className="fixed left-16 top-0 h-full w-64 bg-white shadow-xl z-50">
+            <div className="fixed left-16 top-0 h-full w-64 bg-card border-r border-border shadow-xl z-50">
               <div onClick={handleCollapseSidebar}>
                 <Sidebar />
               </div>
@@ -141,7 +146,7 @@ const AppLayout = () => {
       )}
 
       {/* Main Content */}
-      <Layout 
+      <div 
         style={{ 
           marginLeft: 0,
           height: '100vh', 
@@ -149,14 +154,14 @@ const AppLayout = () => {
         }}
         className="md:ml-16"
       >
-        <Content className="p-2 md:p-6 h-full overflow-hidden pb-16 md:pb-6">
+        <div className="p-2 md:p-6 h-full overflow-hidden pb-16 md:pb-6 bg-background">
           <MainContent />
-        </Content>
-      </Layout>
+        </div>
+      </div>
 
       {/* Footer Navigation - Mobile only */}
       <FooterNavigation />
-    </Layout>
+    </div>
   );
 };
 

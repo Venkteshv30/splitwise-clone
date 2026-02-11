@@ -1,11 +1,11 @@
 // components/tabs/BalancesTab.js
 import React from "react";
-import { Card, Typography, Tag, Space, Empty, Divider, Spin } from "antd";
-import { CalculatorOutlined, ArrowRightOutlined } from "@ant-design/icons";
+import { Calculator, ArrowRight, Loader2 } from "lucide-react";
 import { useAppContext } from "../../contexts/AppContext";
 import { useExpenses } from "../../hooks/useFirestore";
-
-const { Text, Title } = Typography;
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { cn } from "../../lib/utils";
 
 const BalancesTab = () => {
   const { selectedGroup } = useAppContext();
@@ -14,17 +14,17 @@ const BalancesTab = () => {
   if (loading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
-        <Spin />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (expenses.length === 0) {
     return (
-      <Empty
-        description="No expenses to calculate balances"
-        image={Empty.PRESENTED_IMAGE_SIMPLE}
-      />
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
+        <Calculator className="h-12 w-12 text-muted-foreground mb-4" />
+        <p className="text-sm text-muted-foreground">No expenses to calculate balances</p>
+      </div>
     );
   }
 
@@ -59,7 +59,6 @@ const BalancesTab = () => {
 
   // Calculate net balance
   Object.keys(balances).forEach((person) => {
-    console.log(balances[person].paid - balances[person].owes);
     balances[person].balance = balances[person].paid - balances[person].owes;
   });
 
@@ -76,11 +75,10 @@ const BalancesTab = () => {
     ([, balance]) => Math.abs(balance.balance) <= 0.01
   );
 
-  // Simple debt simplification - FIXED VERSION (Solution 2)
+  // Simple debt simplification
   const simplifyDebts = () => {
     const settlements = [];
 
-    // Work with separate data structures instead of modifying balance objects
     let creditorsData = creditors.map(([id, balance]) => ({
       id,
       name: balance.name,
@@ -122,39 +120,46 @@ const BalancesTab = () => {
   };
 
   const settlements = simplifyDebts();
+
   return (
     <div className="space-y-4">
       {/* Individual Balances */}
-      <div className="text-center font-semibold text-xs sm:text-sm"> Individual Balances</div>
+      <div className="text-center font-semibold text-xs sm:text-sm text-foreground">
+        Individual Balances
+      </div>
       <div className="space-y-2">
         {Object.entries(balances)
           .sort(([, a], [, b]) => b.balance - a.balance)
           .map(([person, balance]) => (
             <div
               key={person}
-              className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-2 px-2 sm:px-3 border border-gray-100 rounded"
+              className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-2 px-2 sm:px-3 border border-border rounded-lg bg-card"
             >
               <div className="flex-1">
-                <Text strong className="text-xs sm:text-sm">
+                <p className="text-xs sm:text-sm font-semibold text-foreground">
                   {balance.name}
-                </Text>
-                <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5">
-                  <Space split={<span>|</span>} size="small">
-                    <span>Paid: ₹{balance.paid.toFixed(2)}</span>
-                    <span>Owes: ₹{balance.owes.toFixed(2)}</span>
-                  </Space>
+                </p>
+                <div className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 flex items-center gap-2">
+                  <span>Paid: ₹{balance.paid.toFixed(2)}</span>
+                  <span>|</span>
+                  <span>Owes: ₹{balance.owes.toFixed(2)}</span>
                 </div>
               </div>
               <div className="mt-1 sm:mt-0">
-                <Tag
-                  color={
+                <Badge
+                  variant={
                     balance.balance >= 0.01
-                      ? "green"
+                      ? "default"
                       : balance.balance <= -0.01
-                      ? "red"
-                      : "default"
+                      ? "destructive"
+                      : "secondary"
                   }
-                  className="text-[10px] sm:text-xs font-medium"
+                  className={cn(
+                    "text-[10px] sm:text-xs font-medium",
+                    balance.balance >= 0.01 && "bg-green-500/20 text-green-400 border-green-500/30",
+                    balance.balance <= -0.01 && "bg-red-500/20 text-red-400 border-red-500/30",
+                    Math.abs(balance.balance) <= 0.01 && "bg-muted text-muted-foreground"
+                  )}
                 >
                   {balance.balance >= 0.01
                     ? "Gets back"
@@ -163,83 +168,87 @@ const BalancesTab = () => {
                     : "Settled"}
                   {Math.abs(balance.balance) > 0.01 &&
                     ` ₹${Math.abs(balance.balance).toFixed(2)}`}
-                </Tag>
+                </Badge>
               </div>
             </div>
           ))}
       </div>
 
       {/* Debt Simplification */}
-      <div className="flex items-center justify-center font-semibold text-xs sm:text-sm mt-4">
-        <CalculatorOutlined className="mr-2" />
+      <div className="flex items-center justify-center font-semibold text-xs sm:text-sm mt-4 text-foreground">
+        <Calculator className="mr-2 h-4 w-4" />
         Simplified Settlements
       </div>
       {settlements.length === 0 ? (
         <div className="text-center py-4 sm:py-6">
-          <Text className="text-base sm:text-lg text-green-600 block mb-1">
+          <p className="text-base sm:text-lg text-green-400 block mb-1">
             🎉 All settled up!
-          </Text>
-          <Text type="secondary" className="text-xs sm:text-sm">Everyone's expenses are balanced</Text>
+          </p>
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            Everyone's expenses are balanced
+          </p>
         </div>
       ) : (
         <div className="space-y-2">
           {settlements.map((settlement, index) => (
             <div
               key={index}
-              className="flex items-center justify-between py-2 px-2 sm:px-3 bg-blue-50 rounded"
+              className="flex items-center justify-between py-2 px-2 sm:px-3 bg-primary/10 rounded-lg border border-primary/20"
             >
               <div className="flex items-center space-x-2">
-                <span className="font-semibold text-xs sm:text-sm">
+                <span className="font-semibold text-xs sm:text-sm text-foreground">
                   {settlement.fromName || settlement.from.split("@")[0]}
                 </span>
-                <ArrowRightOutlined className="text-blue-500 text-xs sm:text-sm" />
-                <span className="font-semibold text-xs sm:text-sm">
+                <ArrowRight className="text-primary h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="font-semibold text-xs sm:text-sm text-foreground">
                   {settlement.toName || settlement.to.split("@")[0]}
                 </span>
               </div>
-              <Tag
-                color="blue"
-                className="text-xs sm:text-sm font-medium"
-              >
+              <Badge variant="outline" className="text-xs sm:text-sm font-medium border-primary/30 text-primary">
                 ₹{settlement.amount.toFixed(2)}
-              </Tag>
+              </Badge>
             </div>
           ))}
 
-          <Divider className="my-2" />
+          <div className="border-t border-border my-2" />
 
           <div className="text-center">
-            <Text type="secondary" className="text-xs sm:text-sm">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               With these {settlements.length} transaction
               {settlements.length !== 1 ? "s" : ""}, everyone will be settled
               up!
-            </Text>
+            </p>
           </div>
         </div>
       )}
 
       {/* Summary Stats */}
-      <Card size="small" title={<span className="text-xs sm:text-sm">Balance Summary</span>}>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 text-center">
-          <div className="p-2 sm:p-3 bg-green-50 rounded">
-            <Text strong className="text-green-600 block text-sm sm:text-base">
-              {creditors.length}
-            </Text>
-            <Text type="secondary" className="text-xs sm:text-sm">Getting money back</Text>
+      <Card className="border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-xs sm:text-sm">Balance Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 text-center">
+            <div className="p-2 sm:p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+              <p className="text-green-400 block text-sm sm:text-base font-semibold">
+                {creditors.length}
+              </p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Getting money back</p>
+            </div>
+            <div className="p-2 sm:p-3 bg-red-500/10 rounded-lg border border-red-500/20">
+              <p className="text-red-400 block text-sm sm:text-base font-semibold">
+                {debtors.length}
+              </p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Owe money</p>
+            </div>
+            <div className="p-2 sm:p-3 bg-muted rounded-lg border border-border">
+              <p className="text-muted-foreground block text-sm sm:text-base font-semibold">
+                {evenMembers.length}
+              </p>
+              <p className="text-xs sm:text-sm text-muted-foreground">All settled</p>
+            </div>
           </div>
-          <div className="p-2 sm:p-3 bg-red-50 rounded">
-            <Text strong className="text-red-600 block text-sm sm:text-base">
-              {debtors.length}
-            </Text>
-            <Text type="secondary" className="text-xs sm:text-sm">Owe money</Text>
-          </div>
-          <div className="p-2 sm:p-3 bg-gray-50 rounded">
-            <Text strong className="text-gray-600 block text-sm sm:text-base">
-              {evenMembers.length}
-            </Text>
-            <Text type="secondary" className="text-xs sm:text-sm">All settled</Text>
-          </div>
-        </div>
+        </CardContent>
       </Card>
     </div>
   );

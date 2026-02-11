@@ -1,41 +1,41 @@
 // components/Sidebar.js
 import React from "react";
-import { Button, Typography } from "antd";
-import { PlusOutlined, TeamOutlined } from "@ant-design/icons";
+import { Plus, Users } from "lucide-react";
 import { useAppContext } from "../contexts/AppContext";
-
-const { Title } = Typography;
+import { Button } from "./ui/button";
 
 const Sidebar = () => {
   const { setCurrentPage } = useAppContext();
 
   return (
-    <div className="h-full flex flex-col p-4">
+    <div className="h-full flex flex-col p-4 bg-card">
       {/* Header */}
       <div className="mb-6">
-        <Title level={4} className="text-center text-blue-600 mb-6">
+        <h4 className="text-center text-primary text-lg font-semibold mb-6">
           💰 SplitWise
-        </Title>
+        </h4>
       </div>
 
       {/* Navigation Tiles */}
       <div className="flex flex-col space-y-3">
         <Button
-          type="default"
-          icon={<TeamOutlined />}
-          className="w-full h-12 text-left"
+          variant="outline"
+          className="w-full h-12 justify-start"
           onClick={() => setCurrentPage("groups")}
         >
+          <Users className="mr-2 h-4 w-4" />
           Groups
         </Button>
 
         <Button
-          type="default"
-          icon={<PlusOutlined />}
+          variant="outline"
+          size="icon"
           className="w-full h-12"
           onClick={() => setCurrentPage("createGroup")}
           title="Create Group"
-        />
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );

@@ -1,19 +1,10 @@
 // components/tabs/TotalTab.js
 import React from "react";
-import {
-  Card,
-  Statistic,
-  Avatar,
-  Typography,
-  Empty,
-  Spin,
-  Divider,
-} from "antd";
-import { DollarOutlined, UserOutlined } from "@ant-design/icons";
+import { DollarSign, Loader2 } from "lucide-react";
 import { useAppContext } from "../../contexts/AppContext";
 import { useExpenses } from "../../hooks/useFirestore";
-
-const { Text } = Typography;
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { cn } from "../../lib/utils";
 
 const TotalTab = () => {
   const { selectedGroup } = useAppContext();
@@ -26,17 +17,17 @@ const TotalTab = () => {
   if (loading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
-        <Spin />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (expenses.length === 0) {
     return (
-      <Empty
-        description="No expenses to calculate totals"
-        image={Empty.PRESENTED_IMAGE_SIMPLE}
-      />
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
+        <DollarSign className="h-12 w-12 text-muted-foreground mb-4" />
+        <p className="text-sm text-muted-foreground">No expenses to calculate totals</p>
+      </div>
     );
   }
 
@@ -77,94 +68,99 @@ const TotalTab = () => {
   return (
     <div className="space-y-4">
       {/* Total Group Spending */}
-      <Card className="text-center" size="small">
-        <Statistic
-          title={<span className="text-xs sm:text-sm">Total Group Spending</span>}
-          value={totalAmount}
-          prefix="₹"
-          valueStyle={{ color: "#3f8600", fontSize: "1.5rem" }}
-          suffix={
-            <div className="text-xs text-gray-500 mt-1">
-              across {expenses.length} transaction
-              {expenses.length !== 1 ? "s" : ""}
-            </div>
-          }
-        />
+      <Card className="text-center border-border">
+        <CardContent className="pt-6">
+          <p className="text-xs sm:text-sm text-muted-foreground mb-2">Total Group Spending</p>
+          <div className="text-2xl sm:text-3xl font-bold text-green-500 mb-1">
+            ₹{totalAmount.toFixed(2)}
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            across {expenses.length} transaction
+            {expenses.length !== 1 ? "s" : ""}
+          </p>
+        </CardContent>
       </Card>
 
       {/* Spending by Person */}
-      <Card
-        size="small"
-        title={
-          <div className="flex items-center text-xs sm:text-sm">
-            <DollarOutlined className="mr-2" />
+      <Card className="border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-xs sm:text-sm flex items-center">
+            <DollarSign className="mr-2 h-4 w-4" />
             Amount Paid by Each Person
-          </div>
-        }
-      >
-        {Object.keys(personTotals).length === 0 ? (
-          <Empty description="No payment information available" />
-        ) : (
-          <div className="space-y-0">
-            {Object.entries(personTotals)
-              .sort(([, a], [, b]) => b - a) // Sort by amount descending
-              .map(([person, amount], index, array) => (
-                <div key={person}>
-                  <div className="flex items-center justify-between py-2 px-1">
-                    <div className="flex items-center space-x-2">
-                      <Text strong className="text-xs sm:text-sm">
-                        {getDisplayName(memberNameUserIdMapping[person])}
-                      </Text>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {Object.keys(personTotals).length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">No payment information available</p>
+          ) : (
+            <div className="space-y-0">
+              {Object.entries(personTotals)
+                .sort(([, a], [, b]) => b - a)
+                .map(([person, amount], index, array) => (
+                  <div key={person}>
+                    <div className="flex items-center justify-between py-2 px-1">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs sm:text-sm font-medium text-foreground">
+                          {getDisplayName(memberNameUserIdMapping[person])}
+                        </span>
+                      </div>
+                      <span className="text-xs sm:text-sm font-semibold text-green-500">
+                        ₹{amount.toFixed(2)}
+                      </span>
                     </div>
-                    <Text strong className="text-xs sm:text-sm text-green-600">
-                      ₹{amount.toFixed(2)}
-                    </Text>
+                    {index < array.length - 1 && (
+                      <div className="border-b border-border" />
+                    )}
                   </div>
-                  {index < array.length - 1 && <Divider className="my-0" />}
-                </div>
-              ))}
-          </div>
-        )}
+                ))}
+            </div>
+          )}
+        </CardContent>
       </Card>
       {/* Date-wise Spending */}
-      <Card size="small" title={<span className="text-xs sm:text-sm">Date-wise Spending Summary</span>}>
-        {Object.keys(dateWiseSpend).length === 0 ? (
-          <Empty description="No date information available" />
-        ) : (
-          <div className="space-y-2">
-            {Object.entries(dateWiseSpend)
-              .sort(([a], [b]) => new Date(b) - new Date(a)) // Sort by date descending
-              .map(([date, amount]) => (
-                <div
-                  key={date}
-                  className="flex justify-between items-center py-1.5 border-b border-gray-100 last:border-b-0"
-                >
-                  <Text className="text-xs sm:text-sm">
-                    {new Date(date).toLocaleDateString("en-IN", {
-                      weekday: "short",
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </Text>
-                  <Text strong className="text-xs sm:text-sm text-green-600">
-                    ₹{amount.toFixed(2)}
-                  </Text>
+      <Card className="border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-xs sm:text-sm">Date-wise Spending Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {Object.keys(dateWiseSpend).length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">No date information available</p>
+          ) : (
+            <div className="space-y-2">
+              {Object.entries(dateWiseSpend)
+                .sort(([a], [b]) => new Date(b) - new Date(a))
+                .map(([date, amount]) => (
+                  <div
+                    key={date}
+                    className="flex justify-between items-center py-1.5 border-b border-border last:border-b-0"
+                  >
+                    <span className="text-xs sm:text-sm text-foreground">
+                      {new Date(date).toLocaleDateString("en-IN", {
+                        weekday: "short",
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </span>
+                    <span className="text-xs sm:text-sm font-semibold text-green-500">
+                      ₹{amount.toFixed(2)}
+                    </span>
+                  </div>
+                ))}
+              <div className="pt-2 border-t border-border mt-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-xs sm:text-sm font-semibold text-foreground">Total</span>
+                  <span className="text-sm sm:text-base font-semibold text-green-500">
+                    ₹
+                    {Object.values(dateWiseSpend)
+                      .reduce((sum, amount) => sum + amount, 0)
+                      .toFixed(2)}
+                  </span>
                 </div>
-              ))}
-            <div className="pt-2 border-t border-gray-200">
-              <div className="flex justify-between items-center">
-                <Text strong className="text-xs sm:text-sm">Total</Text>
-                <Text strong className="text-sm sm:text-base text-green-600">
-                  ₹
-                  {Object.values(dateWiseSpend)
-                    .reduce((sum, amount) => sum + amount, 0)
-                    .toFixed(2)}
-                </Text>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </CardContent>
       </Card>
     </div>
   );

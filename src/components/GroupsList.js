@@ -1,11 +1,12 @@
 // components/GroupsList.js
 import React from "react";
-import { Button, Card, Typography, Avatar, Empty, Spin } from "antd";
-import { PlusOutlined, TeamOutlined } from "@ant-design/icons";
+import { Plus, Users, Loader2 } from "lucide-react";
 import { useAppContext } from "../contexts/AppContext";
 import { useGroups } from "../hooks/useFirestore";
-
-const { Text } = Typography;
+import { Button } from "./ui/button";
+import { Card, CardContent } from "./ui/card";
+import { Avatar, AvatarFallback } from "./ui/avatar";
+import { cn } from "../lib/utils";
 
 const GroupsList = () => {
   const { currentUser, setSelectedGroup, setCurrentPage } = useAppContext();
@@ -20,13 +21,15 @@ const GroupsList = () => {
     return (
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-4 sm:mb-6">
-          <Text className="text-sm sm:text-base font-semibold">
+          <h2 className="text-sm sm:text-base font-semibold text-foreground">
             Your Groups
-          </Text>
-          <Button type="primary" icon={<PlusOutlined />} loading size="small" />
+          </h2>
+          <Button size="icon" variant="ghost" disabled>
+            <Loader2 className="h-4 w-4 animate-spin" />
+          </Button>
         </div>
         <div className="min-h-[50vh] flex items-center justify-center">
-          <Spin />
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       </div>
     );
@@ -35,76 +38,64 @@ const GroupsList = () => {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-3 sm:mb-4">
-        <Text className="text-sm sm:text-base font-semibold">Your Groups</Text>
+        <h2 className="text-sm sm:text-base font-semibold text-foreground">
+          Your Groups
+        </h2>
         <Button
-          type="primary"
-          icon={<PlusOutlined />}
+          size="icon"
           onClick={() => setCurrentPage("createGroup")}
-          size="small"
-        />
+          className="h-9 w-9"
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
       </div>
 
       {groups.length === 0 ? (
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description={
-            <span className="text-xs sm:text-sm">
-              No groups found. <br />
-              Create your first group to start splitting expenses!
-            </span>
-          }
-        >
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => setCurrentPage("createGroup")}
-            size="small"
-          />
-        </Empty>
+        <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
+          <Users className="h-12 w-12 text-muted-foreground mb-4" />
+          <p className="text-xs sm:text-sm text-muted-foreground mb-4">
+            No groups found. <br />
+            Create your first group to start splitting expenses!
+          </p>
+          <Button size="sm" onClick={() => setCurrentPage("createGroup")}>
+            <Plus className="h-4 w-4 mr-2" />
+            Create Group
+          </Button>
+        </div>
       ) : (
         <div className="space-y-2">
           {groups.map((group) => (
             <Card
               key={group.id}
-              hoverable
-              className="cursor-pointer transition-all"
+              className={cn(
+                "cursor-pointer transition-all hover:bg-accent/50 border-border"
+              )}
               onClick={() => handleGroupSelect(group)}
-              size="small"
-              bodyStyle={{ padding: "12px 16px" }}
             >
-              <div className="flex items-center">
-                {/* Avatar */}
-                <Avatar
-                  size={40}
-                  icon={<TeamOutlined />}
-                  className="bg-blue-500 mr-3 flex-shrink-0"
-                />
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex items-center">
+                  {/* Avatar */}
+                  <Avatar className="h-10 w-10 mr-3 flex-shrink-0 bg-primary/20">
+                    <AvatarFallback className="bg-primary/20 text-primary">
+                      <Users className="h-5 w-5" />
+                    </AvatarFallback>
+                  </Avatar>
 
-                {/* Group Info */}
-                <div className="flex-1 min-w-0">
-                  <Text
-                    strong
-                    className="block text-sm sm:text-base mb-0.5 truncate"
-                  >
-                    {group.name}
-                  </Text>
-                  <div className="flex items-center space-x-2">
-                    <Text type="secondary" className="text-xs sm:text-sm">
-                      <TeamOutlined className="mr-1" />
-                      {group.members?.length || 0} member
-                      {group.members?.length !== 1 ? "s" : ""}
-                    </Text>
-                    {/* {group.creator && (
-                      <>
-                        <span className="text-gray-300">•</span>
-                        <Text type="secondary" className="text-xs sm:text-sm">
-                          {group.creator === currentUser?.uid ? "You" : "Created by " + (group.creator?.split("@")[0] || group.creator)}
-                        </Text>
-                      </>
-                    )} */}
+                  {/* Group Info */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm sm:text-base font-semibold mb-0.5 truncate text-foreground">
+                      {group.name}
+                    </h3>
+                    <div className="flex items-center space-x-2">
+                      <p className="text-xs sm:text-sm text-muted-foreground flex items-center">
+                        <Users className="h-3 w-3 mr-1" />
+                        {group.members?.length || 0} member
+                        {group.members?.length !== 1 ? "s" : ""}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </CardContent>
             </Card>
           ))}
         </div>
