@@ -35,10 +35,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { cn } from "../../lib/utils";
 
 const TransactionsTab = () => {
-  const { selectedGroup, currentUser } = useAppContext();
+  const { selectedGroup, currentUser, setCurrentPage } = useAppContext();
   const { expenses, loading, updateExpense, deleteExpense } = useExpenses(
     selectedGroup?.id
   );
@@ -193,8 +192,15 @@ const TransactionsTab = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
         <Receipt className="h-12 w-12 text-muted-foreground mb-4" />
-        <p className="text-sm text-muted-foreground mb-4">No transactions yet</p>
-        <Button onClick={() => {}}>Add your first expense</Button>
+        <p className="text-sm text-muted-foreground mb-4">
+          No transactions yet
+        </p>
+        <Button
+          onClick={() => setCurrentPage("addExpense")}
+          className="bg-green-500 hover:bg-green-600 text-white"
+        >
+          Add your first expense
+        </Button>
       </div>
     );
   }
@@ -264,7 +270,9 @@ const TransactionsTab = () => {
             {/* Split Details */}
             <Card className="mb-4 border-border">
               <CardHeader className="pb-3">
-                <CardTitle className="text-xs sm:text-sm">Split Between</CardTitle>
+                <CardTitle className="text-xs sm:text-sm">
+                  Split Between
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
@@ -276,9 +284,11 @@ const TransactionsTab = () => {
                       <div className="flex items-center space-x-2">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback>
-                            {(person === currentUser?.email
-                              ? "You"
-                              : getMemberName(person))[0]}
+                            {
+                              (person === currentUser?.email
+                                ? "You"
+                                : getMemberName(person))[0]
+                            }
                           </AvatarFallback>
                         </Avatar>
                         <p className="text-sm font-medium text-foreground">
@@ -292,7 +302,9 @@ const TransactionsTab = () => {
                           ₹{shareAmount.toFixed(2)}
                         </p>
                         {person === currentUser?.email && youBorrowed > 0 && (
-                          <p className="text-[10px] text-red-400">you borrowed</p>
+                          <p className="text-[10px] text-red-400">
+                            you borrowed
+                          </p>
                         )}
                         {person === currentUser?.email && youLent > 0 && (
                           <p className="text-[10px] text-green-400">you lent</p>
@@ -352,7 +364,10 @@ const TransactionsTab = () => {
         </div>
 
         {/* Edit Expense Dialog */}
-        <Dialog open={!!editingExpense} onOpenChange={(open) => !open && setEditingExpense(null)}>
+        <Dialog
+          open={!!editingExpense}
+          onOpenChange={(open) => !open && setEditingExpense(null)}
+        >
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
               <DialogTitle>Edit Expense</DialogTitle>
@@ -418,10 +433,7 @@ const TransactionsTab = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {selectedGroup?.members?.map((member) => (
-                      <SelectItem
-                        key={member.user_id}
-                        value={member.user_id}
-                      >
+                      <SelectItem key={member.user_id} value={member.user_id}>
                         {member.name}
                       </SelectItem>
                     ))}
@@ -430,10 +442,7 @@ const TransactionsTab = () => {
               </div>
             </div>
             <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setEditingExpense(null)}
-              >
+              <Button variant="outline" onClick={() => setEditingExpense(null)}>
                 Cancel
               </Button>
               <Button onClick={handleSaveEdit}>Save Changes</Button>
@@ -579,7 +588,10 @@ const TransactionsTab = () => {
       ))}
 
       {/* Edit Expense Dialog for main list */}
-      <Dialog open={!!editingExpense} onOpenChange={(open) => !open && setEditingExpense(null)}>
+      <Dialog
+        open={!!editingExpense}
+        onOpenChange={(open) => !open && setEditingExpense(null)}
+      >
         <DialogContent className="sm:max-w-[600px]">
           <DialogHeader>
             <DialogTitle>Edit Expense</DialogTitle>
@@ -654,10 +666,7 @@ const TransactionsTab = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setEditingExpense(null)}
-            >
+            <Button variant="outline" onClick={() => setEditingExpense(null)}>
               Cancel
             </Button>
             <Button onClick={handleSaveEdit}>Save Changes</Button>
@@ -676,10 +685,7 @@ const TransactionsTab = () => {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowDeleteModal(false)}
-            >
+            <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
               Cancel
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>

@@ -20,10 +20,7 @@ const GroupsList = () => {
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-4 sm:mb-6">
-          <h2 className="text-sm sm:text-base font-semibold text-foreground">
-            Your Groups
-          </h2>
+        <div className="flex justify-end items-center mb-3 sm:mb-4">
           <Button size="icon" variant="ghost" disabled>
             <Loader2 className="h-4 w-4 animate-spin" />
           </Button>
@@ -37,10 +34,7 @@ const GroupsList = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-3 sm:mb-4">
-        <h2 className="text-sm sm:text-base font-semibold text-foreground">
-          Your Groups
-        </h2>
+      <div className="flex justify-end items-center mb-3 sm:mb-4">
         <Button
           size="icon"
           onClick={() => setCurrentPage("createGroup")}
