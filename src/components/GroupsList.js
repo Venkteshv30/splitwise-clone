@@ -5,7 +5,7 @@ import { PlusOutlined, TeamOutlined } from "@ant-design/icons";
 import { useAppContext } from "../contexts/AppContext";
 import { useGroups } from "../hooks/useFirestore";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const GroupsList = () => {
   const { currentUser, setSelectedGroup, setCurrentPage } = useAppContext();
@@ -23,9 +23,7 @@ const GroupsList = () => {
           <Text className="text-sm sm:text-base font-semibold">
             Your Groups
           </Text>
-          <Button type="primary" icon={<PlusOutlined />} loading size="small">
-            Create Group
-          </Button>
+          <Button type="primary" icon={<PlusOutlined />} loading size="small" />
         </div>
         <div className="min-h-[50vh] flex items-center justify-center">
           <Spin />
@@ -43,10 +41,7 @@ const GroupsList = () => {
           icon={<PlusOutlined />}
           onClick={() => setCurrentPage("createGroup")}
           size="small"
-          className="text-xs sm:text-sm"
-        >
-          Create Group
-        </Button>
+        />
       </div>
 
       {groups.length === 0 ? (
@@ -64,10 +59,7 @@ const GroupsList = () => {
             icon={<PlusOutlined />}
             onClick={() => setCurrentPage("createGroup")}
             size="small"
-            className="text-xs sm:text-sm"
-          >
-            Create Group
-          </Button>
+          />
         </Empty>
       ) : (
         <div className="space-y-2">

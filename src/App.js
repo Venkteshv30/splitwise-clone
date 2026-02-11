@@ -6,10 +6,12 @@ import { signOut } from "firebase/auth";
 import { auth } from "./firebase";
 import Auth from "./components/Auth";
 import Sidebar from "./components/Sidebar";
+import FooterNavigation from "./components/FooterNavigation";
 import GroupsList from "./components/GroupsList";
 import CreateGroup from "./components/CreateGroup";
 import GroupDetail from "./components/GroupDetail";
 import AddExpense from "./components/AddExpense";
+import Profile from "./components/Profile";
 
 const { Sider, Content } = Layout;
 
@@ -26,6 +28,8 @@ const MainContent = () => {
       return <AddExpense />;
     case "createGroup":
       return <CreateGroup />;
+    case "profile":
+      return <Profile />;
     default:
       return <GroupsList />;
   }
@@ -108,36 +112,50 @@ const AppLayout = () => {
 
   return (
     <Layout className="min-h-screen bg-gray-50">
-      {/* Icon Sidebar - Always visible */}
-      <IconSidebar
-        onExpandClick={handleExpandSidebar}
-        onLogout={handleLogout}
-      />
+      {/* Icon Sidebar - Desktop only */}
+      <div className="hidden md:block">
+        <IconSidebar
+          onExpandClick={handleExpandSidebar}
+          onLogout={handleLogout}
+        />
+      </div>
 
-      {/* Expanded Sidebar */}
+      {/* Expanded Sidebar - Desktop only */}
       {sidebarExpanded && (
-        <>
-          {/* Overlay */}
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40"
-            onClick={handleCollapseSidebar}
-          />
+        <div className="hidden md:block">
+          <>
+            {/* Overlay */}
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 z-40"
+              onClick={handleCollapseSidebar}
+            />
 
-          {/* Full Sidebar */}
-          <div className="fixed left-16 top-0 h-full w-64 bg-white shadow-xl z-50">
-            <div onClick={handleCollapseSidebar}>
-              <Sidebar />
+            {/* Full Sidebar */}
+            <div className="fixed left-16 top-0 h-full w-64 bg-white shadow-xl z-50">
+              <div onClick={handleCollapseSidebar}>
+                <Sidebar />
+              </div>
             </div>
-          </div>
-        </>
+          </>
+        </div>
       )}
 
       {/* Main Content */}
-      <Layout style={{ marginLeft: 64, height: '100vh', overflow: 'hidden' }}>
-        <Content className="p-2 md:p-6 h-full overflow-hidden">
+      <Layout 
+        style={{ 
+          marginLeft: 0,
+          height: '100vh', 
+          overflow: 'hidden'
+        }}
+        className="md:ml-16"
+      >
+        <Content className="p-2 md:p-6 h-full overflow-hidden pb-16 md:pb-6">
           <MainContent />
         </Content>
       </Layout>
+
+      {/* Footer Navigation - Mobile only */}
+      <FooterNavigation />
     </Layout>
   );
 };

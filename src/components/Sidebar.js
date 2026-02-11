@@ -32,11 +32,10 @@ const Sidebar = () => {
         <Button
           type="default"
           icon={<PlusOutlined />}
-          className="w-full h-12 text-left"
+          className="w-full h-12"
           onClick={() => setCurrentPage("createGroup")}
-        >
-          Create Group
-        </Button>
+          title="Create Group"
+        />
       </div>
     </div>
   );
