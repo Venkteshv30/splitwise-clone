@@ -1,12 +1,7 @@
 // components/tabs/BalancesTab.js
 import React from "react";
 import { Card, Typography, Tag, Space, Empty, Divider, Spin } from "antd";
-import {
-  CalculatorOutlined,
-  SwapOutlined,
-  RightOutlined,
-  ArrowRightOutlined,
-} from "@ant-design/icons";
+import { CalculatorOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import { useAppContext } from "../../contexts/AppContext";
 import { useExpenses } from "../../hooks/useFirestore";
 

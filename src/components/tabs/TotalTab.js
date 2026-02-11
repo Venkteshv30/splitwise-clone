@@ -74,7 +74,6 @@ const TotalTab = () => {
     return person || "Unknown";
   };
 
-  console.log("personTotals ", personTotals, memberNameUserIdMapping);
   return (
     <div className="space-y-6">
       {/* Total Group Spending */}
