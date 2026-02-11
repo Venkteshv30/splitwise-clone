@@ -1,30 +1,41 @@
 // components/tabs/TransactionsTab.js
 import React, { useState } from "react";
 import {
-  Button,
-  Modal,
-  Form,
-  Input,
-  Select,
-  InputNumber,
-  Empty,
-  Typography,
-  Divider,
-  Card,
-  Spin,
-  Avatar,
-} from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  ArrowLeftOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+  ArrowLeft,
+  Edit,
+  Trash2,
+  User,
+  Loader2,
+  Receipt,
+  ShoppingCart,
+  UtensilsCrossed,
+  Car,
+  Film,
+  Fuel,
+  DollarSign,
+} from "lucide-react";
 import { useAppContext } from "../../contexts/AppContext";
 import { useExpenses } from "../../hooks/useFirestore";
-
-const { Option } = Select;
-const { Text, Title } = Typography;
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Avatar, AvatarFallback } from "../ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { Input } from "../ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { cn } from "../../lib/utils";
 
 const TransactionsTab = () => {
   const { selectedGroup, currentUser } = useAppContext();
@@ -35,93 +46,69 @@ const TransactionsTab = () => {
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteExpenseId, setDeleteExpenseId] = useState(null);
-  const [form] = Form.useForm();
+  const [editForm, setEditForm] = useState({
+    description: "",
+    amount: "",
+    paidBy: "",
+    sharedBy: [],
+  });
 
   const handleEdit = (expense) => {
     setEditingExpense(expense);
-    form.setFieldsValue({
+    setEditForm({
       description: expense.description,
-      amount: expense.amount,
+      amount: expense.amount?.toString(),
       paidBy: expense.paidBy,
-      sharedBy: expense.sharedBy,
+      sharedBy: expense.sharedBy || [],
     });
   };
 
-  const handleSaveEdit = async (values) => {
+  const handleSaveEdit = async () => {
     try {
-      await updateExpense(editingExpense.id, values);
+      await updateExpense(editingExpense.id, {
+        ...editForm,
+        amount: parseFloat(editForm.amount),
+      });
       setEditingExpense(null);
-      form.resetFields();
+      setEditForm({ description: "", amount: "", paidBy: "", sharedBy: [] });
     } catch (error) {
       console.error("Error updating expense:", error);
     }
   };
 
   const handleDelete = (expenseId) => {
-    console.log("del called");
     setDeleteExpenseId(expenseId);
     setShowDeleteModal(true);
   };
 
   const confirmDelete = async () => {
     try {
-      console.log("Deleting expense:", deleteExpenseId);
       await deleteExpense(deleteExpenseId);
       setSelectedExpense(null);
       setShowDeleteModal(false);
       setDeleteExpenseId(null);
-      console.log("Expense deleted successfully");
     } catch (error) {
       console.error("Error deleting expense:", error);
     }
   };
 
-  const cancelDelete = () => {
-    setShowDeleteModal(false);
-    setDeleteExpenseId(null);
-    console.log("Delete cancelled");
-  };
-
-  const handleCancelEdit = () => {
-    setEditingExpense(null);
-    form.resetFields();
-  };
-
-  // Group expenses by date
-  const groupExpensesByDate = (expenses) => {
+  // Group expenses by month
+  const groupExpensesByMonth = (expenses) => {
     const grouped = {};
     expenses.forEach((expense) => {
       const date = expense.createdAt?.toDate
         ? expense.createdAt.toDate()
         : new Date(expense.createdAt);
-      const dateKey = date.toDateString();
-      if (!grouped[dateKey]) {
-        grouped[dateKey] = [];
+      const monthKey = date.toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      });
+      if (!grouped[monthKey]) {
+        grouped[monthKey] = [];
       }
-      grouped[dateKey].push(expense);
+      grouped[monthKey].push(expense);
     });
     return grouped;
-  };
-
-  // Format date for display
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    if (date.toDateString() === today.toDateString()) {
-      return "Today";
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      return "Yesterday";
-    } else {
-      return date.toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year:
-          date.getFullYear() !== today.getFullYear() ? "numeric" : undefined,
-      });
-    }
   };
 
   // Get expense category icon
@@ -133,26 +120,26 @@ const TransactionsTab = () => {
       desc.includes("lunch") ||
       desc.includes("restaurant")
     ) {
-      return "🍽️";
+      return <UtensilsCrossed className="h-4 w-4" />;
     } else if (
       desc.includes("fuel") ||
       desc.includes("gas") ||
       desc.includes("petrol")
     ) {
-      return "⛽";
+      return <Fuel className="h-4 w-4" />;
     } else if (
       desc.includes("cab") ||
       desc.includes("uber") ||
       desc.includes("taxi") ||
       desc.includes("transport")
     ) {
-      return "🚗";
+      return <Car className="h-4 w-4" />;
     } else if (desc.includes("movie") || desc.includes("entertainment")) {
-      return "🎬";
+      return <Film className="h-4 w-4" />;
     } else if (desc.includes("grocery") || desc.includes("shopping")) {
-      return "🛒";
+      return <ShoppingCart className="h-4 w-4" />;
     } else {
-      return "💰";
+      return <Receipt className="h-4 w-4" />;
     }
   };
 
@@ -162,7 +149,7 @@ const TransactionsTab = () => {
     return member?.name || email.split("@")[0];
   };
 
-  // Get month and day from date
+  // Get date parts
   const getDateParts = (expense) => {
     const date = expense.createdAt?.toDate
       ? expense.createdAt.toDate()
@@ -184,11 +171,11 @@ const TransactionsTab = () => {
     let youBorrowed = 0;
 
     if (isCurrentUserPayer && isCurrentUserInvolved) {
-      youLent = expense.amount - shareAmount; // What others owe you
+      youLent = expense.amount - shareAmount;
     } else if (isCurrentUserPayer && !isCurrentUserInvolved) {
-      youLent = expense.amount; // You paid but not involved in split
+      youLent = expense.amount;
     } else if (!isCurrentUserPayer && isCurrentUserInvolved) {
-      youBorrowed = shareAmount; // You owe the payer
+      youBorrowed = shareAmount;
     }
 
     return { youLent, youBorrowed, shareAmount };
@@ -197,21 +184,18 @@ const TransactionsTab = () => {
   if (loading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
-        <Spin />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (expenses.length === 0) {
     return (
-      <Empty
-        description="No transactions yet"
-        image={Empty.PRESENTED_IMAGE_SIMPLE}
-      >
-        <Button type="primary" onClick={() => {}}>
-          Add your first expense
-        </Button>
-      </Empty>
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
+        <Receipt className="h-12 w-12 text-muted-foreground mb-4" />
+        <p className="text-sm text-muted-foreground mb-4">No transactions yet</p>
+        <Button onClick={() => {}}>Add your first expense</Button>
+      </div>
     );
   }
 
@@ -224,407 +208,484 @@ const TransactionsTab = () => {
       <>
         <div className="max-w-2xl mx-auto">
           {/* Header */}
-          <div className="flex items-center mb-3 sm:mb-4 py-2 border-b">
+          <div className="flex items-center mb-4 py-2 border-b border-border">
             <Button
-              type="text"
-              icon={<ArrowLeftOutlined />}
+              variant="ghost"
+              size="sm"
               onClick={() => setSelectedExpense(null)}
               className="mr-2"
-              size="small"
-            />
-            <Text className="text-sm sm:text-base font-semibold m-0">
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Back
+            </Button>
+            <h3 className="text-sm font-semibold text-foreground">
               Transaction Details
-            </Text>
+            </h3>
           </div>
 
           {/* Main Details */}
-          <div className="py-3 sm:py-4">
-            <div className="text-center mb-4 sm:mb-6">
-              <div className="text-2xl sm:text-4xl mb-2 sm:mb-3">
+          <div className="py-4">
+            <div className="text-center mb-6">
+              <div className="text-4xl mb-3">
                 {getExpenseIcon(selectedExpense.description)}
               </div>
-              <Text className="block text-base sm:text-lg font-semibold mb-1 sm:mb-2">
+              <h2 className="text-lg font-semibold mb-2 text-foreground">
                 {selectedExpense.description}
-              </Text>
-              <Text className="text-base sm:text-xl text-green-600 font-semibold">
+              </h2>
+              <p className="text-xl text-green-400 font-semibold">
                 ₹{selectedExpense.amount?.toFixed(2)}
-              </Text>
+              </p>
             </div>
 
             {/* Paid By */}
-            <Card className="mb-3 sm:mb-4" size="small" title={<span className="text-xs sm:text-sm">Paid By</span>}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Avatar size="small" icon={<UserOutlined />} />
-                  <Text strong className="text-xs sm:text-sm">{getMemberName(selectedExpense.paidBy)}</Text>
+            <Card className="mb-4 border-border">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-xs sm:text-sm">Paid By</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>
+                        {getMemberName(selectedExpense.paidBy)[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <p className="text-sm font-medium text-foreground">
+                      {getMemberName(selectedExpense.paidBy)}
+                    </p>
+                  </div>
+                  <p className="text-sm text-foreground">
+                    ₹{selectedExpense.amount?.toFixed(2)}
+                  </p>
                 </div>
-                <Text className="text-sm sm:text-base">
-                  ₹{selectedExpense.amount?.toFixed(2)}
-                </Text>
-              </div>
+              </CardContent>
             </Card>
 
             {/* Split Details */}
-            <Card size="small" title={<span className="text-xs sm:text-sm">Split Between</span>}>
-              <div className="space-y-2">
-                {selectedExpense.sharedBy?.map((person) => (
-                  <div
-                    key={person}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <Avatar size="small" icon={<UserOutlined />} />
-                      <Text strong className="text-xs sm:text-sm">
-                        {person === currentUser?.email
-                          ? "You"
-                          : getMemberName(person)}
-                      </Text>
+            <Card className="mb-4 border-border">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-xs sm:text-sm">Split Between</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {selectedExpense.sharedBy?.map((person) => (
+                    <div
+                      key={person}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <Avatar className="h-8 w-8">
+                          <AvatarFallback>
+                            {(person === currentUser?.email
+                              ? "You"
+                              : getMemberName(person))[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <p className="text-sm font-medium text-foreground">
+                          {person === currentUser?.email
+                            ? "You"
+                            : getMemberName(person)}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-foreground">
+                          ₹{shareAmount.toFixed(2)}
+                        </p>
+                        {person === currentUser?.email && youBorrowed > 0 && (
+                          <p className="text-[10px] text-red-400">you borrowed</p>
+                        )}
+                        {person === currentUser?.email && youLent > 0 && (
+                          <p className="text-[10px] text-green-400">you lent</p>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <Text className="text-sm sm:text-base">₹{shareAmount.toFixed(2)}</Text>
-                      {person === currentUser?.email && youBorrowed > 0 && (
-                        <div className="text-[10px] sm:text-xs text-red-500">you borrowed</div>
-                      )}
-                      {person === currentUser?.email && youLent > 0 && (
-                        <div className="text-[10px] sm:text-xs text-green-500">you lent</div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              </CardContent>
             </Card>
 
             {/* Your Summary */}
             {(youLent > 0 || youBorrowed > 0) && (
-              <Card className="mt-3 sm:mt-4 bg-blue-50" size="small">
-                <div className="text-center">
-                  <Text className="text-xs sm:text-sm">Your Balance</Text>
-                  <div className="text-base sm:text-lg font-semibold mt-1 sm:mt-2">
-                    {youLent > 0 && (
-                      <Text className="text-green-600">
-                        +₹{youLent.toFixed(2)} (you lent)
-                      </Text>
-                    )}
-                    {youBorrowed > 0 && (
-                      <Text className="text-red-600">
-                        -₹{youBorrowed.toFixed(2)} (you borrowed)
-                      </Text>
-                    )}
+              <Card className="mb-4 bg-primary/10 border-primary/20">
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Your Balance
+                    </p>
+                    <div className="text-lg font-semibold">
+                      {youLent > 0 && (
+                        <p className="text-green-400">
+                          +₹{youLent.toFixed(2)} (you lent)
+                        </p>
+                      )}
+                      {youBorrowed > 0 && (
+                        <p className="text-red-400">
+                          -₹{youBorrowed.toFixed(2)} (you borrowed)
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
+                </CardContent>
               </Card>
             )}
 
             {/* Actions */}
-            <div className="flex justify-center space-x-3 sm:space-x-4 mt-4 sm:mt-6">
+            <div className="flex justify-center space-x-3 mt-6">
               <Button
-                icon={<EditOutlined />}
+                variant="outline"
+                size="sm"
                 onClick={() => handleEdit(selectedExpense)}
-                size="small"
-                className="text-xs sm:text-sm"
               >
+                <Edit className="h-4 w-4 mr-1" />
                 Edit
               </Button>
               <Button
-                icon={<DeleteOutlined />}
-                danger
+                variant="destructive"
+                size="sm"
                 onClick={() => handleDelete(selectedExpense.id)}
-                size="small"
-                className="text-xs sm:text-sm"
               >
+                <Trash2 className="h-4 w-4 mr-1" />
                 Delete
               </Button>
             </div>
           </div>
         </div>
 
-        {/* Edit Expense Modal - Detail View */}
-        <Modal
-          title="Edit Expense"
-          open={!!editingExpense}
-          onOk={() => form.submit()}
-          onCancel={handleCancelEdit}
-          width={600}
-          okText="Save Changes"
-          zIndex={9999}
-          centered
-          destroyOnClose={true}
-          getContainer={() => document.body}
-          maskClosable={false}
-        >
-          <Form form={form} layout="vertical" onFinish={handleSaveEdit}>
-            <Form.Item
-              name="description"
-              label="Description"
-              rules={[{ required: true, message: "Please enter description" }]}
-            >
-              <Input placeholder="What was this expense for?" />
-            </Form.Item>
+        {/* Edit Expense Dialog */}
+        <Dialog open={!!editingExpense} onOpenChange={(open) => !open && setEditingExpense(null)}>
+          <DialogContent className="sm:max-w-[600px]">
+            <DialogHeader>
+              <DialogTitle>Edit Expense</DialogTitle>
+              <DialogDescription>
+                Update the expense details below.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Description</label>
+                <Input
+                  value={editForm.description}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, description: e.target.value })
+                  }
+                  placeholder="What was this expense for?"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Amount</label>
+                <Input
+                  type="number"
+                  value={editForm.amount}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, amount: e.target.value })
+                  }
+                  placeholder="0.00"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Paid By</label>
+                <Select
+                  value={editForm.paidBy}
+                  onValueChange={(value) =>
+                    setEditForm({ ...editForm, paidBy: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Who paid for this?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {selectedGroup?.members?.map((member) => (
+                      <SelectItem key={member.user_id} value={member.user_id}>
+                        {member.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Shared By</label>
+                <Select
+                  value={editForm.sharedBy.join(",")}
+                  onValueChange={(value) =>
+                    setEditForm({
+                      ...editForm,
+                      sharedBy: value ? value.split(",") : [],
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Who should split this?" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {selectedGroup?.members?.map((member) => (
+                      <SelectItem
+                        key={member.user_id}
+                        value={member.user_id}
+                      >
+                        {member.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setEditingExpense(null)}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleSaveEdit}>Save Changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
-            <Form.Item
-              name="amount"
-              label="Amount"
-              rules={[{ required: true, message: "Please enter amount" }]}
-            >
-              <InputNumber
-                className="w-full"
-                min={0}
-                placeholder="0.00"
-                addonBefore="₹"
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="paidBy"
-              label="Paid By"
-              rules={[{ required: true, message: "Please select who paid" }]}
-            >
-              <Select placeholder="Who paid for this?">
-                {selectedGroup?.members?.map((member) => (
-                  <Option key={member.user_id} value={member.user_id}>
-                    {member.name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              name="sharedBy"
-              label="Shared By"
-              rules={[
-                {
-                  required: true,
-                  message: "Please select who shares this expense",
-                },
-              ]}
-            >
-              <Select mode="multiple" placeholder="Who should split this?">
-                {selectedGroup?.members?.map((member) => (
-                  <Option key={member.user_id} value={member.user_id}>
-                    {member.name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Form>
-        </Modal>
-
-        {/* Delete Confirmation Modal - Detail View */}
-        <Modal
-          title="Delete Expense"
-          open={showDeleteModal}
-          onOk={confirmDelete}
-          onCancel={cancelDelete}
-          okText="Delete"
-          okType="danger"
-          cancelText="Cancel"
-          zIndex={9999}
-          centered
-          destroyOnClose
-          getContainer={() => document.body}
-          maskClosable={false}
-        >
-          <p>
-            Are you sure you want to delete this expense? This action cannot be
-            undone.
-          </p>
-        </Modal>
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Expense</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this expense? This action cannot
+                be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={confirmDelete}>
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </>
     );
   }
 
-  // Show main list view
-  const groupedExpenses = groupExpensesByDate(expenses);
-  const sortedDates = Object.keys(groupedExpenses).sort(
-    (a, b) => new Date(b) - new Date(a)
-  );
+  // Show main list view - grouped by month
+  const groupedExpenses = groupExpensesByMonth(expenses);
+  const sortedMonths = Object.keys(groupedExpenses).sort((a, b) => {
+    return new Date(b) - new Date(a);
+  });
 
   return (
-    <div className="space-y-4">
-      {sortedDates.map((dateKey) => (
-        <div key={dateKey}>
-          {/* Date Header */}
-          <div className="flex flex-col items-center mb-2">
-            <Text className="text-gray-600 m-0 text-xs sm:text-sm font-medium">
-              {formatDate(dateKey)}
-            </Text>
-            <Divider className="flex-1 m-0 mt-1" />
-          </div>
+    <div className="space-y-6">
+      {sortedMonths.map((monthKey) => (
+        <div key={monthKey}>
+          {/* Month Header */}
+          <h3 className="text-sm font-semibold text-foreground mb-3 px-1">
+            {monthKey}
+          </h3>
 
-          {/* Expenses for this date */}
-          <div className="space-y-2">
-            {groupedExpenses[dateKey].map((expense) => {
-              const { month, day } = getDateParts(expense);
-              const { youLent, youBorrowed } = calculateAmounts(expense);
-              const isPaidByCurrentUser = expense.paidBy === currentUser?.email;
+          {/* Expenses for this month */}
+          <div className="space-y-1">
+            {groupedExpenses[monthKey]
+              .sort((a, b) => {
+                const dateA = a.createdAt?.toDate
+                  ? a.createdAt.toDate()
+                  : new Date(a.createdAt);
+                const dateB = b.createdAt?.toDate
+                  ? b.createdAt.toDate()
+                  : new Date(b.createdAt);
+                return dateB - dateA;
+              })
+              .map((expense) => {
+                const { month, day } = getDateParts(expense);
+                const { youLent, youBorrowed } = calculateAmounts(expense);
+                const isPaidByCurrentUser =
+                  expense.paidBy === currentUser?.email;
 
-              return (
-                <div
-                  key={expense.id}
-                  className="flex items-center py-2 px-2 sm:px-3 bg-white rounded cursor-pointer hover:bg-gray-50 transition-colors"
-                  onClick={() => setSelectedExpense(expense)}
-                >
-                  {/* Date Column */}
-                  <div className="text-center mr-2 sm:mr-3 min-w-[24px] sm:min-w-[40px]">
-                    <div className="text-[9px] sm:text-[10px] text-gray-500 uppercase leading-tight">
-                      {month}
+                return (
+                  <div
+                    key={expense.id}
+                    className="flex items-center py-3 px-2 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors"
+                    onClick={() => setSelectedExpense(expense)}
+                  >
+                    {/* Date Column */}
+                    <div className="text-center mr-3 min-w-[40px]">
+                      <div className="text-[10px] text-muted-foreground uppercase leading-tight">
+                        {month}
+                      </div>
+                      <div className="text-sm font-semibold leading-tight text-foreground">
+                        {day}
+                      </div>
                     </div>
-                    <div className="text-xs sm:text-sm font-semibold leading-tight">
-                      {day}
+
+                    {/* Icon */}
+                    <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center mr-3 flex-shrink-0 text-muted-foreground">
+                      {getExpenseIcon(expense.description)}
+                    </div>
+
+                    {/* Description Column */}
+                    <div className="flex-1 min-w-0">
+                      <p className="block truncate text-sm font-medium text-foreground">
+                        {expense.description}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {isPaidByCurrentUser
+                          ? `You paid ₹${expense.amount?.toFixed(2)}`
+                          : `${getMemberName(
+                              expense.paidBy
+                            )} paid ₹${expense.amount?.toFixed(2)}`}
+                      </p>
+                    </div>
+
+                    {/* Amount Column */}
+                    <div className="text-right min-w-[80px] flex-shrink-0">
+                      {youLent > 0 && (
+                        <>
+                          <div className="text-[10px] text-muted-foreground leading-tight">
+                            you lent
+                          </div>
+                          <div className="text-sm font-semibold text-green-400 leading-tight">
+                            ₹{youLent.toFixed(2)}
+                          </div>
+                        </>
+                      )}
+                      {youBorrowed > 0 && (
+                        <>
+                          <div className="text-[10px] text-muted-foreground leading-tight">
+                            you borrowed
+                          </div>
+                          <div className="text-sm font-semibold text-orange-400 leading-tight">
+                            ₹{youBorrowed.toFixed(2)}
+                          </div>
+                        </>
+                      )}
+                      {youLent === 0 && youBorrowed === 0 && (
+                        <>
+                          <div className="text-[10px] text-muted-foreground leading-tight">
+                            not involved
+                          </div>
+                          <div className="text-sm font-semibold text-muted-foreground leading-tight">
+                            ₹0.00
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
-
-                  {/* Icon */}
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-full flex items-center justify-center text-sm sm:text-base mr-2 sm:mr-3 flex-shrink-0">
-                    {getExpenseIcon(expense.description)}
-                  </div>
-
-                  {/* Description Column */}
-                  <div className="flex-1 min-w-0">
-                    <Text
-                      strong
-                      className="block truncate text-xs sm:text-sm font-medium"
-                    >
-                      {expense.description}
-                    </Text>
-                    <Text type="secondary" className="text-[10px] sm:text-xs">
-                      {isPaidByCurrentUser
-                        ? `You paid ₹${expense.amount?.toFixed(2)}`
-                        : `${getMemberName(
-                            expense.paidBy
-                          )} paid ₹${expense.amount?.toFixed(2)}`}
-                    </Text>
-                  </div>
-
-                  {/* Amount Column */}
-                  <div className="text-right min-w-[70px] sm:min-w-[80px] flex-shrink-0">
-                    {youLent > 0 && (
-                      <>
-                        <div className="text-[10px] sm:text-xs text-gray-500 leading-tight">you lent</div>
-                        <div className="text-xs sm:text-sm font-semibold text-green-600 leading-tight">
-                          ₹{youLent.toFixed(2)}
-                        </div>
-                      </>
-                    )}
-                    {youBorrowed > 0 && (
-                      <>
-                        <div className="text-[10px] sm:text-xs text-gray-500 leading-tight">
-                          you borrowed
-                        </div>
-                        <div className="text-xs sm:text-sm font-semibold text-red-600 leading-tight">
-                          ₹{youBorrowed.toFixed(2)}
-                        </div>
-                      </>
-                    )}
-                    {youLent === 0 && youBorrowed === 0 && (
-                      <>
-                        <div className="text-[10px] sm:text-xs text-gray-500 leading-tight">
-                          not involved
-                        </div>
-                        <div className="text-xs sm:text-sm font-semibold text-gray-400 leading-tight">
-                          ₹0.00
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         </div>
       ))}
 
-      {/* Edit Expense Modal for main list view */}
-      <Modal
-        title="Edit Expense"
-        open={!!editingExpense}
-        onOk={() => form.submit()}
-        onCancel={handleCancelEdit}
-        width={600}
-        okText="Save Changes"
-        zIndex={9999}
-        centered
-        destroyOnClose={true}
-        getContainer={() => document.body}
-        maskClosable={false}
-      >
-        <Form form={form} layout="vertical" onFinish={handleSaveEdit}>
-          <Form.Item
-            name="description"
-            label="Description"
-            rules={[{ required: true, message: "Please enter description" }]}
-          >
-            <Input placeholder="What was this expense for?" />
-          </Form.Item>
+      {/* Edit Expense Dialog for main list */}
+      <Dialog open={!!editingExpense} onOpenChange={(open) => !open && setEditingExpense(null)}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Edit Expense</DialogTitle>
+            <DialogDescription>
+              Update the expense details below.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Description</label>
+              <Input
+                value={editForm.description}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, description: e.target.value })
+                }
+                placeholder="What was this expense for?"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Amount</label>
+              <Input
+                type="number"
+                value={editForm.amount}
+                onChange={(e) =>
+                  setEditForm({ ...editForm, amount: e.target.value })
+                }
+                placeholder="0.00"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Paid By</label>
+              <Select
+                value={editForm.paidBy}
+                onValueChange={(value) =>
+                  setEditForm({ ...editForm, paidBy: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Who paid for this?" />
+                </SelectTrigger>
+                <SelectContent>
+                  {selectedGroup?.members?.map((member) => (
+                    <SelectItem key={member.user_id} value={member.user_id}>
+                      {member.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Shared By</label>
+              <Select
+                value={editForm.sharedBy.join(",")}
+                onValueChange={(value) =>
+                  setEditForm({
+                    ...editForm,
+                    sharedBy: value ? value.split(",") : [],
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Who should split this?" />
+                </SelectTrigger>
+                <SelectContent>
+                  {selectedGroup?.members?.map((member) => (
+                    <SelectItem key={member.user_id} value={member.user_id}>
+                      {member.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setEditingExpense(null)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleSaveEdit}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
-          <Form.Item
-            name="amount"
-            label="Amount"
-            rules={[{ required: true, message: "Please enter amount" }]}
-          >
-            <InputNumber
-              className="w-full"
-              min={0}
-              placeholder="0.00"
-              addonBefore="₹"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="paidBy"
-            label="Paid By"
-            rules={[{ required: true, message: "Please select who paid" }]}
-          >
-            <Select placeholder="Who paid for this?">
-              {selectedGroup?.members?.map((member) => (
-                <Option key={member.user_id} value={member.user_id}>
-                  {member.name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item
-            name="sharedBy"
-            label="Shared By"
-            rules={[
-              {
-                required: true,
-                message: "Please select who shares this expense",
-              },
-            ]}
-          >
-            <Select mode="multiple" placeholder="Who should split this?">
-              {selectedGroup?.members?.map((member) => (
-                <Option key={member.user_id} value={member.user_id}>
-                  {member.name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      {/* Delete Confirmation Modal for main list view */}
-      <Modal
-        title="Delete Expense"
-        open={showDeleteModal}
-        onOk={confirmDelete}
-        onCancel={cancelDelete}
-        okText="Delete"
-        okType="danger"
-        cancelText="Cancel"
-        zIndex={9999}
-        centered
-        destroyOnClose
-        getContainer={() => document.body}
-        maskClosable={false}
-      >
-        <p>
-          Are you sure you want to delete this expense? This action cannot be
-          undone.
-        </p>
-      </Modal>
+      {/* Delete Confirmation Dialog for main list */}
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Expense</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this expense? This action cannot
+              be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Menu, LogOut, Users, Loader2 } from "lucide-react";
 import { AppProvider, useAppContext } from "./contexts/AppContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import { signOut } from "firebase/auth";
 import { auth } from "./firebase";
 import Auth from "./components/Auth";
@@ -168,9 +169,11 @@ const AppLayout = () => {
 // Main App Component
 const App = () => {
   return (
-    <AppProvider>
-      <AppLayout />
-    </AppProvider>
+    <ThemeProvider>
+      <AppProvider>
+        <AppLayout />
+      </AppProvider>
+    </ThemeProvider>
   );
 };
 
