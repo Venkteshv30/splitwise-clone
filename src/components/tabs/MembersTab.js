@@ -87,7 +87,7 @@ const MembersTab = () => {
                     <Avatar
                       className={cn(
                         "w-8 h-8 sm:w-10 sm:h-10",
-                        isGoogleMail(member.user_id) && "bg-blue-500"
+                        isGoogleMail(member.user_id) && "bg-muted"
                       )}
                     >
                       <AvatarFallback className="text-xs sm:text-sm">
@@ -105,7 +105,7 @@ const MembersTab = () => {
                       {isGoogleMail(member.user_id) && (
                         <div className="ml-1 flex-shrink-0">
                           <svg
-                            className="w-3 h-3 text-blue-500"
+                            className="w-3 h-3 text-muted-foreground"
                             viewBox="0 0 24 24"
                             fill="currentColor"
                           >
@@ -152,11 +152,11 @@ const MembersTab = () => {
       </div>
 
       {/* Summary Stats */}
-      <Card className="mt-3 sm:mt-4 bg-primary/5 border-primary/20">
+      <Card className="mt-3 sm:mt-4 bg-muted/30 border-border">
         <CardContent className="p-3 sm:p-4">
           <div className="grid grid-cols-2 gap-2 sm:gap-3 text-center">
             <div>
-              <p className="text-primary block text-sm sm:text-base font-semibold">
+              <p className="text-foreground block text-sm sm:text-base font-semibold">
                 {selectedGroup.members.length}
               </p>
               <p className="text-xs sm:text-sm text-muted-foreground">
@@ -164,7 +164,7 @@ const MembersTab = () => {
               </p>
             </div>
             <div>
-              <p className="text-primary block text-sm sm:text-base font-semibold">
+              <p className="text-foreground block text-sm sm:text-base font-semibold">
                 {
                   selectedGroup.members.filter((m) => isGoogleMail(m.user_id))
                     .length

@@ -36,7 +36,7 @@ const FooterNavigation = () => {
               className={cn(
                 "flex flex-col items-center justify-center h-full px-6 flex-1 transition-colors",
                 isActive(item.page)
-                  ? "text-primary"
+                  ? "text-foreground"
                   : "text-muted-foreground"
               )}
               onClick={() => setCurrentPage(item.page)}

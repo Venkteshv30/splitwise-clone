@@ -5,7 +5,7 @@ import { useAppContext } from "../contexts/AppContext";
 import { useGroups } from "../hooks/useFirestore";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { generateGroupAvatar } from "../utils/groupAvatar";
 import { cn } from "../lib/utils";
 
 const GroupsList = () => {
@@ -74,12 +74,32 @@ const GroupsList = () => {
             >
               <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center">
-                  {/* Avatar */}
-                  <Avatar className="h-10 w-10 mr-3 flex-shrink-0 bg-primary/20">
-                    <AvatarFallback className="bg-primary/20 text-primary">
-                      <Users className="h-5 w-5" />
-                    </AvatarFallback>
-                  </Avatar>
+                  {/* Group Avatar */}
+                  {(() => {
+                    const avatarStyle =
+                      group.avatarColor && group.avatarPattern
+                        ? {
+                            backgroundColor: group.avatarColor,
+                            patternColor: group.avatarPattern,
+                          }
+                        : generateGroupAvatar(group.name);
+                    return (
+                      <div
+                        className="h-10 w-10 mr-3 flex-shrink-0 rounded-lg"
+                        style={{
+                          backgroundColor: `hsl(${avatarStyle.backgroundColor})`,
+                          backgroundImage: `
+                            linear-gradient(45deg, hsl(${avatarStyle.patternColor}) 25%, transparent 25%),
+                            linear-gradient(-45deg, hsl(${avatarStyle.patternColor}) 25%, transparent 25%),
+                            linear-gradient(45deg, transparent 75%, hsl(${avatarStyle.patternColor}) 75%),
+                            linear-gradient(-45deg, transparent 75%, hsl(${avatarStyle.patternColor}) 75%)
+                          `,
+                          backgroundSize: "10px 10px",
+                          backgroundPosition: "0 0, 0 5px, 5px -5px, -5px 0px",
+                        }}
+                      />
+                    );
+                  })()}
 
                   {/* Group Info */}
                   <div className="flex-1 min-w-0">

@@ -193,18 +193,18 @@ const BalancesTab = () => {
           {settlements.map((settlement, index) => (
             <div
               key={index}
-              className="flex items-center justify-between py-2 px-2 sm:px-3 bg-primary/10 rounded-lg border border-primary/20"
+              className="flex items-center justify-between py-2 px-2 sm:px-3 bg-muted/30 rounded-lg border border-border"
             >
               <div className="flex items-center space-x-2">
                 <span className="font-semibold text-xs sm:text-sm text-foreground">
                   {settlement.fromName || settlement.from.split("@")[0]}
                 </span>
-                <ArrowRight className="text-primary h-3 w-3 sm:h-4 sm:w-4" />
+                <ArrowRight className="text-muted-foreground h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="font-semibold text-xs sm:text-sm text-foreground">
                   {settlement.toName || settlement.to.split("@")[0]}
                 </span>
               </div>
-              <Badge variant="outline" className="text-xs sm:text-sm font-medium border-primary/30 text-primary">
+              <Badge variant="outline" className="text-xs sm:text-sm font-medium border-border text-foreground">
                 ₹{settlement.amount.toFixed(2)}
               </Badge>
             </div>

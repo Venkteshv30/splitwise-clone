@@ -11,7 +11,7 @@ const Sidebar = () => {
     <div className="h-full flex flex-col p-4 bg-card">
       {/* Header */}
       <div className="mb-6">
-        <h4 className="text-center text-primary text-lg font-semibold mb-6">
+        <h4 className="text-center text-foreground text-lg font-semibold mb-6">
           💰 SplitWise
         </h4>
       </div>

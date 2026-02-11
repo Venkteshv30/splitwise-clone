@@ -22,6 +22,7 @@ import {
 import { useAppContext } from "../contexts/AppContext";
 import { useGroups } from "../hooks/useFirestore";
 import { sendNotification } from "../utils/helperMethods";
+import { generateGroupAvatar } from "../utils/groupAvatar";
 
 const { Title } = Typography;
 
@@ -141,11 +142,17 @@ const CreateGroup = () => {
       // Create memberIds array for efficient querying
       const memberIds = processedMembers.map((member) => member.user_id);
 
+      // Generate group avatar pattern
+      const avatarStyle = generateGroupAvatar(values.name);
+
       const groupData = {
         name: values.name,
         creator: currentUser.email,
+        createdBy: currentUser.email,
         members: processedMembers,
         memberIds: memberIds, // For efficient Firestore queries
+        avatarColor: avatarStyle.backgroundColor,
+        avatarPattern: avatarStyle.patternColor,
       };
 
       await createGroup(groupData);

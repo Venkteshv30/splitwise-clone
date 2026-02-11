@@ -209,7 +209,7 @@ const ExportTab = () => {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="text-center mb-4 sm:mb-6">
-        <Download className="text-3xl sm:text-4xl text-primary mb-2 sm:mb-3 mx-auto" />
+        <Download className="text-3xl sm:text-4xl text-foreground mb-2 sm:mb-3 mx-auto" />
         <p className="text-base sm:text-lg font-semibold block mb-1 text-foreground">
           Export Group Data
         </p>
@@ -262,7 +262,7 @@ const ExportTab = () => {
           <CardContent className="p-3 sm:p-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center space-x-2 sm:space-x-3 flex-1">
-                <Share2 className="text-lg sm:text-xl text-primary flex-shrink-0" />
+                <Share2 className="text-lg sm:text-xl text-foreground flex-shrink-0" />
                 <div>
                   <p className="text-xs sm:text-sm font-semibold block mb-0.5 text-foreground">
                     Share Summary

@@ -306,7 +306,7 @@ const TransactionsTab = () => {
 
             {/* Your Summary */}
             {(youLent > 0 || youBorrowed > 0) && (
-              <Card className="mb-4 bg-primary/10 border-primary/20">
+              <Card className="mb-4 bg-muted/30 border-border">
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <p className="text-xs text-muted-foreground mb-2">

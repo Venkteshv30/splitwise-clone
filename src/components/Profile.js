@@ -59,7 +59,7 @@ const Profile = () => {
             <Avatar
               className={cn(
                 "mb-3 sm:mb-4 h-20 w-20",
-                isGoogleMail && "bg-blue-500"
+                isGoogleMail && "bg-muted"
               )}
             >
               <AvatarImage src={currentUser?.photoURL} />
@@ -85,7 +85,7 @@ const Profile = () => {
 
             {/* Google Badge */}
             {isGoogleMail && (
-              <Badge variant="outline" className="mt-1 border-blue-500/30 text-blue-400">
+              <Badge variant="outline" className="mt-1 border-border text-muted-foreground">
                 <svg
                   className="w-3 h-3 mr-1"
                   viewBox="0 0 24 24"
