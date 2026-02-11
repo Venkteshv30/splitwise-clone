@@ -29,20 +29,21 @@ const GroupDetail = () => {
   return (
     <div className="max-w-6xl mx-auto h-full flex flex-col overflow-hidden">
       {/* Header - Fixed */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0 flex-shrink-0">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 space-y-3 sm:space-y-0 flex-shrink-0">
         <div>
           <Button
             type="link"
             icon={<ArrowLeftOutlined />}
             onClick={() => setCurrentPage("groups")}
-            className="p-0 mb-2"
+            className="p-0 mb-1 sm:mb-2 text-xs sm:text-base"
+            size="small"
           >
             Back to Groups
           </Button>
-          <Title level={2} className="mb-1">
+          <Title level={2} className="mb-1 text-lg sm:text-2xl">
             {selectedGroup.name}
           </Title>
-          <div className="text-gray-500">
+          <div className="text-gray-500 text-xs sm:text-sm">
             {selectedGroup.members?.length || 0} members
           </div>
         </div>
@@ -50,7 +51,8 @@ const GroupDetail = () => {
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => setCurrentPage("addExpense")}
-          size="large"
+          size="small"
+          className="text-xs sm:text-base sm:h-auto h-8"
         >
           Add Expense
         </Button>
@@ -61,7 +63,12 @@ const GroupDetail = () => {
         <Tabs
           defaultActiveKey="transactions"
           className="group-detail-tabs"
-          type="card"
+          type="line"
+          tabBarStyle={{
+            margin: 0,
+            padding: '0 8px',
+          }}
+          moreIcon={null}
         >
           <TabPane tab="Transactions" key="transactions">
             <div className="tab-content-scrollable">

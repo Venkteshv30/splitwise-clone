@@ -60,7 +60,46 @@ code {
 .group-detail-tabs .ant-tabs-nav {
   flex-shrink: 0;
   margin: 0;
-  padding: 0 16px;
+  padding: 0 8px;
+}
+
+.group-detail-tabs .ant-tabs-nav-list {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.group-detail-tabs .ant-tabs-nav-list::-webkit-scrollbar {
+  display: none;
+}
+
+.group-detail-tabs .ant-tabs-tab {
+  padding: 8px 12px;
+  font-size: 12px;
+  white-space: nowrap;
+  min-width: auto;
+  line-height: 1.4;
+}
+
+.group-detail-tabs .ant-tabs-tab-btn {
+  font-size: 12px;
+}
+
+@media (min-width: 768px) {
+  .group-detail-tabs .ant-tabs-nav {
+    padding: 0 16px;
+  }
+  
+  .group-detail-tabs .ant-tabs-tab {
+    padding: 12px 20px;
+    font-size: 15px;
+  }
+  
+  .group-detail-tabs .ant-tabs-tab-btn {
+    font-size: 15px;
+  }
 }
 
 .group-detail-tabs .ant-tabs-content-holder {
@@ -84,16 +123,18 @@ code {
 }
 
 .tab-content-scrollable {
-  padding: 8px 16px;
+  padding: 8px 12px;
   overflow-y: auto;
   height: 100%;
   width: 100%;
   box-sizing: border-box;
   flex: 1;
+  font-size: 13px;
 }
 
 @media (min-width: 768px) {
   .tab-content-scrollable {
     padding: 16px;
+    font-size: 14px;
   }
 }
