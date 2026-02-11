@@ -1,15 +1,9 @@
 // components/GroupDetail.js
 import React, { useState } from "react";
-import { ArrowLeft, Settings, Users, Plus } from "lucide-react";
+import { ArrowLeft, Settings, Users, Plus, Calculator, DollarSign, User, Download } from "lucide-react";
 import { useAppContext } from "../contexts/AppContext";
 import TransactionsTab from "./tabs/TransactionsTab";
-import TotalTab from "./tabs/TotalTab";
-import BalancesTab from "./tabs/BalancesTab";
-import ExportTab from "./tabs/ExportTab";
-import MembersTab from "./tabs/MembersTab";
 import { Button } from "./ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
-import { Card } from "./ui/card";
 import {
   Dialog,
   DialogContent,
@@ -22,11 +16,9 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { generateGroupAvatar } from "../utils/groupAvatar";
 import { useGroups } from "../hooks/useFirestore";
-import { cn } from "../lib/utils";
 
 const GroupDetail = () => {
   const { selectedGroup, setCurrentPage, currentUser } = useAppContext();
-  const [activeTab, setActiveTab] = useState("transactions");
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [groupName, setGroupName] = useState("");
   const { updateGroup } = useGroups(currentUser?.email);
@@ -65,6 +57,13 @@ const GroupDetail = () => {
         patternColor: selectedGroup.avatarPattern,
       }
     : generateGroupAvatar(selectedGroup.name);
+
+  const navigationButtons = [
+    { key: "total", label: "Total", icon: DollarSign, page: "totalPage" },
+    { key: "balances", label: "Balances", icon: Calculator, page: "balancesPage" },
+    { key: "members", label: "Members", icon: User, page: "membersPage" },
+    { key: "export", label: "Export", icon: Download, page: "exportPage" },
+  ];
 
   return (
     <div className="max-w-6xl mx-auto h-full flex flex-col overflow-hidden px-4 sm:px-6">
@@ -122,70 +121,32 @@ const GroupDetail = () => {
         {!isCreator && <div className="w-5" />}
       </div>
 
-      {/* Tabs - Fixed Header, Scrollable Content */}
-      <Card className="flex flex-col flex-1 min-h-0 overflow-hidden border-border">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="group-detail-tabs flex flex-col flex-1 min-h-0">
-          <TabsList className="w-full justify-start rounded-none border-b border-border bg-transparent p-0 h-auto">
-            <TabsTrigger 
-              value="transactions" 
-              className="px-3 sm:px-4 py-2 text-xs sm:text-sm data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none"
+      {/* Border Bottom */}
+      <div className="border-b border-border mb-3 flex-shrink-0" />
+
+      {/* Navigation Buttons Row */}
+      <div className="flex items-center gap-2 mb-2 flex-shrink-0 overflow-x-auto scrollbar-hide -mx-4 px-4">
+        {navigationButtons.map((btn) => {
+          const Icon = btn.icon;
+          return (
+            <Button
+              key={btn.key}
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(btn.page)}
+              className="flex items-center space-x-1.5 px-3 py-1.5 text-xs sm:text-sm whitespace-nowrap flex-shrink-0"
             >
-              Transactions
-            </TabsTrigger>
-            <TabsTrigger 
-              value="total"
-              className="px-3 sm:px-4 py-2 text-xs sm:text-sm data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none"
-            >
-              Total
-            </TabsTrigger>
-            <TabsTrigger 
-              value="balances"
-              className="px-3 sm:px-4 py-2 text-xs sm:text-sm data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none"
-            >
-              Balances
-            </TabsTrigger>
-            <TabsTrigger 
-              value="members"
-              className="px-3 sm:px-4 py-2 text-xs sm:text-sm data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none"
-            >
-              Members
-            </TabsTrigger>
-            <TabsTrigger 
-              value="export"
-              className="px-3 sm:px-4 py-2 text-xs sm:text-sm data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none"
-            >
-              Export
-            </TabsTrigger>
-          </TabsList>
-          <div className="flex-1 min-h-0 overflow-hidden">
-            <TabsContent value="transactions" className="mt-0 h-full flex flex-col data-[state=active]:flex">
-              <div className="tab-content-scrollable">
-                <TransactionsTab />
-              </div>
-            </TabsContent>
-            <TabsContent value="total" className="mt-0 h-full flex flex-col data-[state=active]:flex">
-              <div className="tab-content-scrollable">
-                <TotalTab />
-              </div>
-            </TabsContent>
-            <TabsContent value="balances" className="mt-0 h-full flex flex-col data-[state=active]:flex">
-              <div className="tab-content-scrollable">
-                <BalancesTab />
-              </div>
-            </TabsContent>
-            <TabsContent value="members" className="mt-0 h-full flex flex-col data-[state=active]:flex">
-              <div className="tab-content-scrollable">
-                <MembersTab />
-              </div>
-            </TabsContent>
-            <TabsContent value="export" className="mt-0 h-full flex flex-col data-[state=active]:flex">
-              <div className="tab-content-scrollable">
-                <ExportTab />
-              </div>
-            </TabsContent>
-          </div>
-        </Tabs>
-      </Card>
+              <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span>{btn.label}</span>
+            </Button>
+          );
+        })}
+      </div>
+
+      {/* Transactions Content - Scrollable */}
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide -mx-4 px-2">
+        <TransactionsTab />
+      </div>
 
       {/* Floating Add Expense Button */}
       <Button

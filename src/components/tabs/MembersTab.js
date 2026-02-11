@@ -1,14 +1,30 @@
 // components/tabs/MembersTab.js
-import React from "react";
-import { Mail, User } from "lucide-react";
+import React, { useState } from "react";
+import { Mail, User, Edit2 } from "lucide-react";
 import { useAppContext } from "../../contexts/AppContext";
+import { useGroups } from "../../hooks/useFirestore";
 import { Card, CardContent } from "../ui/card";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Checkbox } from "../ui/checkbox";
 import { cn } from "../../lib/utils";
 
 const MembersTab = () => {
-  const { selectedGroup } = useAppContext();
+  const { selectedGroup, currentUser } = useAppContext();
+  const { updateGroup } = useGroups(currentUser?.email);
+  const [editingMember, setEditingMember] = useState(null);
+  const [editForm, setEditForm] = useState({ name: "", email: "", isGoogleAccount: false });
 
   // Check if email is a Gmail address
   const isGoogleMail = (email) => {
@@ -55,7 +71,77 @@ const MembersTab = () => {
   }
 
   // Find the creator
-  const creatorId = selectedGroup.createdBy;
+  const creatorId = selectedGroup.createdBy || selectedGroup.creator;
+  const isCreator = creatorId === currentUser?.email;
+
+  const handleEditMember = (member) => {
+    setEditingMember(member);
+    const isGoogle = member.is_google_email || isGoogleMail(member.user_id || member.email);
+    setEditForm({
+      name: member.name || "",
+      email: member.email || (isGoogle ? member.user_id : "") || "",
+      isGoogleAccount: isGoogle,
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingMember || !editForm.name.trim()) {
+      return;
+    }
+
+    // Validate email only if Google Account is checked
+    if (editForm.isGoogleAccount && editForm.email && !validateEmail(editForm.email)) {
+      return;
+    }
+
+    try {
+      // Update the members array
+      const updatedMembers = selectedGroup.members.map((member) => {
+        if (member.user_id === editingMember.user_id) {
+          const updatedMember = {
+            ...member,
+            name: editForm.name.trim(),
+            email: editForm.email?.trim() || null,
+            is_google_email: editForm.isGoogleAccount,
+          };
+          
+          // If Google Account is checked and email is provided, use email as user_id
+          // Otherwise, keep original user_id or generate a new one for dummy users
+          if (editForm.isGoogleAccount && editForm.email?.trim()) {
+            updatedMember.user_id = editForm.email.trim();
+          } else if (!editForm.isGoogleAccount) {
+            // For non-Google accounts, keep original user_id or use name-based ID
+            if (!member.user_id || member.user_id.includes("@")) {
+              // Generate a simple ID based on name if it was previously an email
+              updatedMember.user_id = `user_${editForm.name.trim().toLowerCase().replace(/\s+/g, "_")}_${Date.now()}`;
+            }
+          }
+          
+          return updatedMember;
+        }
+        return member;
+      });
+
+      // Update memberIds array
+      const updatedMemberIds = updatedMembers.map((m) => m.user_id);
+
+      await updateGroup(selectedGroup.id, {
+        members: updatedMembers,
+        memberIds: updatedMemberIds,
+      });
+
+      setEditingMember(null);
+      setEditForm({ name: "", email: "", isGoogleAccount: false });
+    } catch (error) {
+      console.error("Error updating member:", error);
+    }
+  };
+
+  const validateEmail = (email) => {
+    if (!email) return false; // Email is required if Google Account is checked
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   return (
     <div className="space-y-3">
@@ -134,22 +220,112 @@ const MembersTab = () => {
                   </div>
                 </div>
 
-                {/* Right side - Status/Role */}
-                <div className="hidden sm:block text-right flex-shrink-0">
-                  <Badge variant="outline" className="mb-0 text-xs border-green-500/30 text-green-400">
-                    Member
-                  </Badge>
-                  {member.id && (
-                    <div className="text-[10px] text-muted-foreground mt-0.5">
-                      ID: {member.id.slice(-6)}
-                    </div>
+                {/* Right side - Edit button or Status/Role */}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {isCreator && member.user_id !== creatorId && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEditMember(member)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
                   )}
+                  <div className="hidden sm:block text-right">
+                    <Badge variant="outline" className="mb-0 text-xs border-green-500/30 text-green-400">
+                      Member
+                    </Badge>
+                    {member.id && (
+                      <div className="text-[10px] text-muted-foreground mt-0.5">
+                        ID: {member.id.slice(-6)}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {/* Edit Member Dialog */}
+      <Dialog open={!!editingMember} onOpenChange={(open) => !open && setEditingMember(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Member</DialogTitle>
+            <DialogDescription>
+              Update the member's name and email. Changes will be saved to the group.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="memberName">Name *</Label>
+              <Input
+                id="memberName"
+                value={editForm.name}
+                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                placeholder="Enter member name"
+                autoComplete="off"
+              />
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="isGoogleAccount"
+                  checked={editForm.isGoogleAccount}
+                  onCheckedChange={(checked) => {
+                    setEditForm({ 
+                      ...editForm, 
+                      isGoogleAccount: checked,
+                      email: checked ? editForm.email : "" // Clear email if unchecked
+                    });
+                  }}
+                />
+                <Label 
+                  htmlFor="isGoogleAccount" 
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  Google Account
+                </Label>
+              </div>
+              {editForm.isGoogleAccount && (
+                <div className="space-y-2">
+                  <Label htmlFor="memberEmail">Email *</Label>
+                  <Input
+                    id="memberEmail"
+                    type="email"
+                    value={editForm.email}
+                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                    placeholder="Enter email address"
+                    autoComplete="off"
+                  />
+                  {editForm.email && !validateEmail(editForm.email) && (
+                    <p className="text-xs text-destructive">Please enter a valid email address</p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setEditingMember(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveEdit}
+              disabled={
+                !editForm.name.trim() || 
+                (editForm.isGoogleAccount && (!editForm.email || !validateEmail(editForm.email)))
+              }
+            >
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Summary Stats */}
       <Card className="mt-3 sm:mt-4 bg-muted/30 border-border">

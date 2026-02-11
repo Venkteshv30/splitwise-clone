@@ -12,6 +12,10 @@ import CreateGroup from "./components/CreateGroup";
 import GroupDetail from "./components/GroupDetail";
 import AddExpense from "./components/AddExpense";
 import Profile from "./components/Profile";
+import TotalPage from "./components/TotalPage";
+import BalancesPage from "./components/BalancesPage";
+import MembersPage from "./components/MembersPage";
+import ExportPage from "./components/ExportPage";
 import { Button } from "./components/ui/button";
 import { cn } from "./lib/utils";
 
@@ -30,6 +34,14 @@ const MainContent = () => {
       return <CreateGroup />;
     case "profile":
       return <Profile />;
+    case "totalPage":
+      return <TotalPage />;
+    case "balancesPage":
+      return <BalancesPage />;
+    case "membersPage":
+      return <MembersPage />;
+    case "exportPage":
+      return <ExportPage />;
     default:
       return <GroupsList />;
   }

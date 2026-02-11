@@ -475,16 +475,16 @@ const TransactionsTab = () => {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3 py-1">
       {sortedMonths.map((monthKey) => (
         <div key={monthKey}>
           {/* Month Header */}
-          <h3 className="text-sm font-semibold text-foreground mb-3 px-1">
+          <h3 className="text-xs font-semibold text-foreground mb-1.5 px-2">
             {monthKey}
           </h3>
 
           {/* Expenses for this month */}
-          <div className="space-y-1">
+          <div className="space-y-0">
             {groupedExpenses[monthKey]
               .sort((a, b) => {
                 const dateA = a.createdAt?.toDate
@@ -504,30 +504,32 @@ const TransactionsTab = () => {
                 return (
                   <div
                     key={expense.id}
-                    className="flex items-center py-3 px-2 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors"
+                    className="flex items-center py-1.5 px-2 rounded-lg cursor-pointer hover:bg-accent/50 transition-colors"
                     onClick={() => setSelectedExpense(expense)}
                   >
                     {/* Date Column */}
-                    <div className="text-center mr-3 min-w-[40px]">
-                      <div className="text-[10px] text-muted-foreground uppercase leading-tight">
+                    <div className="text-center mr-2 min-w-[35px]">
+                      <div className="text-[9px] text-muted-foreground uppercase leading-tight">
                         {month}
                       </div>
-                      <div className="text-sm font-semibold leading-tight text-foreground">
+                      <div className="text-xs font-semibold leading-tight text-foreground">
                         {day}
                       </div>
                     </div>
 
                     {/* Icon */}
-                    <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center mr-3 flex-shrink-0 text-muted-foreground">
-                      {getExpenseIcon(expense.description)}
+                    <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center mr-2 flex-shrink-0 text-muted-foreground">
+                      <div className="scale-75">
+                        {getExpenseIcon(expense.description)}
+                      </div>
                     </div>
 
                     {/* Description Column */}
                     <div className="flex-1 min-w-0">
-                      <p className="block truncate text-sm font-medium text-foreground">
+                      <p className="block truncate text-xs font-medium text-foreground">
                         {expense.description}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-[10px] text-muted-foreground leading-tight">
                         {isPaidByCurrentUser
                           ? `You paid ₹${expense.amount?.toFixed(2)}`
                           : `${getMemberName(
@@ -537,33 +539,33 @@ const TransactionsTab = () => {
                     </div>
 
                     {/* Amount Column */}
-                    <div className="text-right min-w-[80px] flex-shrink-0">
+                    <div className="text-right min-w-[70px] flex-shrink-0">
                       {youLent > 0 && (
                         <>
-                          <div className="text-[10px] text-muted-foreground leading-tight">
+                          <div className="text-[9px] text-muted-foreground leading-tight">
                             you lent
                           </div>
-                          <div className="text-sm font-semibold text-green-400 leading-tight">
+                          <div className="text-xs font-semibold text-green-400 leading-tight">
                             ₹{youLent.toFixed(2)}
                           </div>
                         </>
                       )}
                       {youBorrowed > 0 && (
                         <>
-                          <div className="text-[10px] text-muted-foreground leading-tight">
+                          <div className="text-[9px] text-muted-foreground leading-tight">
                             you borrowed
                           </div>
-                          <div className="text-sm font-semibold text-orange-400 leading-tight">
+                          <div className="text-xs font-semibold text-orange-400 leading-tight">
                             ₹{youBorrowed.toFixed(2)}
                           </div>
                         </>
                       )}
                       {youLent === 0 && youBorrowed === 0 && (
                         <>
-                          <div className="text-[10px] text-muted-foreground leading-tight">
+                          <div className="text-[9px] text-muted-foreground leading-tight">
                             not involved
                           </div>
-                          <div className="text-sm font-semibold text-muted-foreground leading-tight">
+                          <div className="text-xs font-semibold text-muted-foreground leading-tight">
                             ₹0.00
                           </div>
                         </>

@@ -13,12 +13,7 @@ import {
   Avatar,
   Popconfirm,
 } from "antd";
-import {
-  ArrowLeftOutlined,
-  PlusOutlined,
-  UserOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import { AiOutlineArrowLeft, AiOutlinePlus, AiOutlineUser, AiOutlineDelete } from "react-icons/ai";
 import { useAppContext } from "../contexts/AppContext";
 import { useGroups } from "../hooks/useFirestore";
 import { sendNotification } from "../utils/helperMethods";
@@ -170,7 +165,7 @@ const CreateGroup = () => {
       <div className="mb-6">
         <Button
           type="link"
-          icon={<ArrowLeftOutlined />}
+          icon={<AiOutlineArrowLeft />}
           onClick={() => setCurrentPage("groups")}
           className="p-0 mb-2"
         >
@@ -199,7 +194,7 @@ const CreateGroup = () => {
             <div className="mb-4">
               <Button
                 type="dashed"
-                icon={<PlusOutlined />}
+                icon={<AiOutlinePlus />}
                 onClick={() => setIsModalVisible(true)}
                 size="large"
                 className="w-full"
@@ -224,14 +219,14 @@ const CreateGroup = () => {
                           <Button
                             type="text"
                             danger
-                            icon={<DeleteOutlined />}
+                            icon={<AiOutlineDelete />}
                             size="small"
                           />
                         </Popconfirm>,
                       ]}
                     >
                       <List.Item.Meta
-                        avatar={<Avatar icon={<UserOutlined />} />}
+                        avatar={<Avatar icon={<AiOutlineUser />} />}
                         title={member.name}
                         description={
                           member.email ? (

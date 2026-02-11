@@ -1,22 +1,11 @@
 // components/Auth.js
 import React, { useState } from "react";
-import {
-  Card,
-  Form,
-  Input,
-  Button,
-  Typography,
-  Space,
-  Divider,
-  message,
-} from "antd";
-import { GoogleOutlined, MailOutlined, LockOutlined } from "@ant-design/icons";
+import { Card, Form, Typography, message } from "antd";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-  signInWithRedirect,
 } from "firebase/auth";
 import { auth } from "../firebase";
 
@@ -25,7 +14,6 @@ const { Title, Text } = Typography;
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [form] = Form.useForm();
 
   const handleEmailAuth = async (values) => {
     setLoading(true);
