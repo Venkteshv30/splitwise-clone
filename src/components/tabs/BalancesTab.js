@@ -123,29 +123,29 @@ const BalancesTab = () => {
 
   const settlements = simplifyDebts();
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Individual Balances */}
-      <div className="text-center font-bold"> Individual Balances</div>
-      <div className="space-y-4">
+      <div className="text-center font-semibold text-xs sm:text-sm"> Individual Balances</div>
+      <div className="space-y-2">
         {Object.entries(balances)
           .sort(([, a], [, b]) => b.balance - a.balance)
           .map(([person, balance]) => (
             <div
               key={person}
-              className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border border-gray-100 rounded-lg"
+              className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-2 px-2 sm:px-3 border border-gray-100 rounded"
             >
               <div className="flex-1">
-                <Text strong className="text-base">
+                <Text strong className="text-xs sm:text-sm">
                   {balance.name}
                 </Text>
-                <div className="text-sm text-gray-500 mt-1">
-                  <Space split={<span>|</span>}>
+                <div className="text-[10px] sm:text-xs text-gray-500 mt-0.5">
+                  <Space split={<span>|</span>} size="small">
                     <span>Paid: ₹{balance.paid.toFixed(2)}</span>
                     <span>Owes: ₹{balance.owes.toFixed(2)}</span>
                   </Space>
                 </div>
               </div>
-              <div className="mt-2 sm:mt-0">
+              <div className="mt-1 sm:mt-0">
                 <Tag
                   color={
                     balance.balance >= 0.01
@@ -154,7 +154,7 @@ const BalancesTab = () => {
                       ? "red"
                       : "default"
                   }
-                  className="text-sm font-medium"
+                  className="text-[10px] sm:text-xs font-medium"
                 >
                   {balance.balance >= 0.01
                     ? "Gets back"
@@ -170,54 +170,46 @@ const BalancesTab = () => {
       </div>
 
       {/* Debt Simplification */}
-      {/* <Card
-        title={
-          <div className="flex items-center">
-            <CalculatorOutlined className="mr-2" />
-            Simplified Settlements
-          </div>
-        }
-      > */}
-      <div className="flex items-center justify-center font-bold">
+      <div className="flex items-center justify-center font-semibold text-xs sm:text-sm mt-4">
         <CalculatorOutlined className="mr-2" />
         Simplified Settlements
       </div>
       {settlements.length === 0 ? (
-        <div className="text-center py-8">
-          <Title level={4} className="text-green-600">
+        <div className="text-center py-4 sm:py-6">
+          <Text className="text-base sm:text-lg text-green-600 block mb-1">
             🎉 All settled up!
-          </Title>
-          <Text type="secondary">Everyone's expenses are balanced</Text>
+          </Text>
+          <Text type="secondary" className="text-xs sm:text-sm">Everyone's expenses are balanced</Text>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-2">
           {settlements.map((settlement, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-4 bg-blue-50 rounded-lg"
+              className="flex items-center justify-between py-2 px-2 sm:px-3 bg-blue-50 rounded"
             >
-              <div className="flex items-center space-x-3">
-                <span className="font-bold text-[10px] md:text-lg">
+              <div className="flex items-center space-x-2">
+                <span className="font-semibold text-xs sm:text-sm">
                   {settlement.fromName || settlement.from.split("@")[0]}
                 </span>
-                <ArrowRightOutlined className="text-blue-500" />
-                <span className="font-bold text-[10px] md:text-lg">
+                <ArrowRightOutlined className="text-blue-500 text-xs sm:text-sm" />
+                <span className="font-semibold text-xs sm:text-sm">
                   {settlement.toName || settlement.to.split("@")[0]}
                 </span>
               </div>
               <Tag
                 color="blue"
-                className="text-[11px] md:text-base font-medium  "
+                className="text-xs sm:text-sm font-medium"
               >
                 ₹{settlement.amount.toFixed(2)}
               </Tag>
             </div>
           ))}
 
-          <Divider />
+          <Divider className="my-2" />
 
           <div className="text-center">
-            <Text type="secondary" className="text-sm">
+            <Text type="secondary" className="text-xs sm:text-sm">
               With these {settlements.length} transaction
               {settlements.length !== 1 ? "s" : ""}, everyone will be settled
               up!
@@ -225,28 +217,27 @@ const BalancesTab = () => {
           </div>
         </div>
       )}
-      {/* </Card> */}
 
       {/* Summary Stats */}
-      <Card title="Balance Summary">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-          <div className="p-4 bg-green-50 rounded-lg">
-            <Text strong className="text-green-600 block text-lg">
+      <Card size="small" title={<span className="text-xs sm:text-sm">Balance Summary</span>}>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 text-center">
+          <div className="p-2 sm:p-3 bg-green-50 rounded">
+            <Text strong className="text-green-600 block text-sm sm:text-base">
               {creditors.length}
             </Text>
-            <Text type="secondary">Getting money back</Text>
+            <Text type="secondary" className="text-xs sm:text-sm">Getting money back</Text>
           </div>
-          <div className="p-4 bg-red-50 rounded-lg">
-            <Text strong className="text-red-600 block text-lg">
+          <div className="p-2 sm:p-3 bg-red-50 rounded">
+            <Text strong className="text-red-600 block text-sm sm:text-base">
               {debtors.length}
             </Text>
-            <Text type="secondary">Owe money</Text>
+            <Text type="secondary" className="text-xs sm:text-sm">Owe money</Text>
           </div>
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <Text strong className="text-gray-600 block text-lg">
+          <div className="p-2 sm:p-3 bg-gray-50 rounded">
+            <Text strong className="text-gray-600 block text-sm sm:text-base">
               {evenMembers.length}
             </Text>
-            <Text type="secondary">All settled</Text>
+            <Text type="secondary" className="text-xs sm:text-sm">All settled</Text>
           </div>
         </div>
       </Card>

@@ -1,6 +1,6 @@
 // components/GroupsList.js
 import React from "react";
-import { Button, Card, Typography, Avatar, Row, Col, Empty, Spin } from "antd";
+import { Button, Card, Typography, Avatar, Empty, Spin } from "antd";
 import { PlusOutlined, TeamOutlined } from "@ant-design/icons";
 import { useAppContext } from "../contexts/AppContext";
 import { useGroups } from "../hooks/useFirestore";
@@ -19,9 +19,11 @@ const GroupsList = () => {
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <Title level={2}>Your Groups</Title>
-          <Button type="primary" icon={<PlusOutlined />} loading>
+        <div className="flex justify-between items-center mb-4 sm:mb-6">
+          <Text className="text-sm sm:text-base font-semibold">
+            Your Groups
+          </Text>
+          <Button type="primary" icon={<PlusOutlined />} loading size="small">
             Create Group
           </Button>
         </div>
@@ -34,12 +36,14 @@ const GroupsList = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
-        <span className="text-md md:text-xl">Your Groups</span>
+      <div className="flex justify-between items-center mb-3 sm:mb-4">
+        <Text className="text-sm sm:text-base font-semibold">Your Groups</Text>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => setCurrentPage("createGroup")}
+          size="small"
+          className="text-xs sm:text-sm"
         >
           Create Group
         </Button>
@@ -49,7 +53,7 @@ const GroupsList = () => {
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           description={
-            <span>
+            <span className="text-xs sm:text-sm">
               No groups found. <br />
               Create your first group to start splitting expenses!
             </span>
@@ -59,43 +63,59 @@ const GroupsList = () => {
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => setCurrentPage("createGroup")}
+            size="small"
+            className="text-xs sm:text-sm"
           >
             Create Group
           </Button>
         </Empty>
       ) : (
-        <Row gutter={[16, 16]}>
+        <div className="space-y-2">
           {groups.map((group) => (
-            <Col xs={24} sm={12} lg={8} key={group.id}>
-              <Card
-                hoverable
-                className="h-full"
-                onClick={() => handleGroupSelect(group)}
-                actions={[
-                  <div key="members" className="text-center">
-                    <TeamOutlined className="mr-1" />
-                    {group.members?.length || 0} members
-                  </div>,
-                ]}
-              >
-                <div className="text-center">
-                  <Avatar
-                    size={64}
-                    icon={<TeamOutlined />}
-                    className="bg-blue-500 mb-4"
-                  />
-                  <Title level={4} className="mb-2">
+            <Card
+              key={group.id}
+              hoverable
+              className="cursor-pointer transition-all"
+              onClick={() => handleGroupSelect(group)}
+              size="small"
+              bodyStyle={{ padding: "12px 16px" }}
+            >
+              <div className="flex items-center">
+                {/* Avatar */}
+                <Avatar
+                  size={40}
+                  icon={<TeamOutlined />}
+                  className="bg-blue-500 mr-3 flex-shrink-0"
+                />
+
+                {/* Group Info */}
+                <div className="flex-1 min-w-0">
+                  <Text
+                    strong
+                    className="block text-sm sm:text-base mb-0.5 truncate"
+                  >
                     {group.name}
-                  </Title>
-                  <Text type="secondary" className="text-sm">
-                    Created by{" "}
-                    {group.creator === currentUser?.uid ? "You" : group.creator}
                   </Text>
+                  <div className="flex items-center space-x-2">
+                    <Text type="secondary" className="text-xs sm:text-sm">
+                      <TeamOutlined className="mr-1" />
+                      {group.members?.length || 0} member
+                      {group.members?.length !== 1 ? "s" : ""}
+                    </Text>
+                    {/* {group.creator && (
+                      <>
+                        <span className="text-gray-300">•</span>
+                        <Text type="secondary" className="text-xs sm:text-sm">
+                          {group.creator === currentUser?.uid ? "You" : "Created by " + (group.creator?.split("@")[0] || group.creator)}
+                        </Text>
+                      </>
+                    )} */}
+                  </div>
                 </div>
-              </Card>
-            </Col>
+              </div>
+            </Card>
           ))}
-        </Row>
+        </div>
       )}
     </div>
   );

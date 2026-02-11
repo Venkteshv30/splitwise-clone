@@ -54,13 +54,13 @@ const MembersTab = () => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Header */}
-      <div className="mb-3 md:mb-6">
-        <Title level={4} className="mb-2">
+      <div className="mb-2 sm:mb-3">
+        <Text className="text-sm sm:text-base font-semibold block mb-1">
           Group Members
-        </Title>
-        <Text type="secondary">
+        </Text>
+        <Text type="secondary" className="text-xs sm:text-sm">
           {selectedGroup.members.length} member
           {selectedGroup.members.length !== 1 ? "s" : ""} in{" "}
           {selectedGroup.name}
@@ -68,42 +68,46 @@ const MembersTab = () => {
       </div>
 
       {/* Members List */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         {selectedGroup.members.map((member) => (
           <Card
             key={member.id || member.user_id}
-            className="hover:shadow-md transition-shadow"
-            bodyStyle={{ padding: "16px" }}
+            className="hover:shadow-sm transition-shadow"
+            size="small"
+            bodyStyle={{ padding: "8px 12px" }}
           >
             <div className="flex items-center justify-between">
               {/* Left side - Avatar and info */}
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 sm:space-x-3">
                 {/* Avatar */}
                 <div className="relative">
                   <Avatar
-                    className="size-6 md:size-12 "
+                    size="small"
+                    className="w-8 h-8 sm:w-10 sm:h-10"
                     style={{
                       backgroundColor: isGoogleMail(member.user_id)
                         ? "#4285f4"
                         : "#1890ff",
-                      fontSize: "18px",
+                      fontSize: "12px",
                     }}
                   >
-                    <span className="text-sm md:xl">
-                      {getInitials(member.name, member.user_id)}{" "}
+                    <span className="text-xs sm:text-sm">
+                      {getInitials(member.name, member.user_id)}
                     </span>
                   </Avatar>
                 </div>
 
                 {/* Member info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex justify-start items-center space-x-2 mb-1">
-                    {getDisplayName(member)} {/* Google badge */}
+                  <div className="flex justify-start items-center space-x-1 mb-0.5">
+                    <Text strong className="text-xs sm:text-sm">
+                      {getDisplayName(member)}
+                    </Text>
                     {isGoogleMail(member.user_id) && (
-                      <div className="ml-2 p-1 ">
+                      <div className="ml-1">
                         <GoogleOutlined
                           style={{
-                            fontSize: "12px",
+                            fontSize: "10px",
                             color: "#4285f4",
                           }}
                         />
@@ -113,10 +117,10 @@ const MembersTab = () => {
 
                   {member.user_id && (
                     <div className="flex items-center space-x-1">
-                      <MailOutlined className="text-gray-400 text-xs" />
+                      <MailOutlined className="text-gray-400 text-[10px]" />
                       <Text
                         type="secondary"
-                        className="text-[11px] md:text-sm truncate"
+                        className="text-[10px] sm:text-xs truncate"
                       >
                         {member.user_id}
                       </Text>
@@ -126,12 +130,12 @@ const MembersTab = () => {
               </div>
 
               {/* Right side - Status/Role */}
-              <div className="hidden md:block text-right">
-                <Tag color="green" className="mb-0">
+              <div className="hidden sm:block text-right">
+                <Tag color="green" className="mb-0 text-xs">
                   Member
                 </Tag>
                 {member.id && (
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className="text-[10px] text-gray-400 mt-0.5">
                     ID: {member.id.slice(-6)}
                   </div>
                 )}
@@ -142,24 +146,24 @@ const MembersTab = () => {
       </div>
 
       {/* Summary Stats */}
-      <Card className="mt-6 bg-blue-50">
-        <div className="grid grid-cols-2 gap-4 text-center">
+      <Card className="mt-3 sm:mt-4 bg-blue-50" size="small">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 text-center">
           <div>
-            <Text strong className="text-blue-600 block text-lg">
+            <Text strong className="text-blue-600 block text-sm sm:text-base">
               {selectedGroup.members.length}
             </Text>
-            <Text type="secondary" className="text-sm">
+            <Text type="secondary" className="text-xs sm:text-sm">
               Total Members
             </Text>
           </div>
           <div>
-            <Text strong className="text-blue-600 block text-lg">
+            <Text strong className="text-blue-600 block text-sm sm:text-base">
               {
                 selectedGroup.members.filter((m) => isGoogleMail(m.user_id))
                   .length
               }
             </Text>
-            <Text type="secondary" className="text-sm">
+            <Text type="secondary" className="text-xs sm:text-sm">
               Google Accounts
             </Text>
           </div>

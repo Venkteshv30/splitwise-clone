@@ -75,16 +75,16 @@ const TotalTab = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Total Group Spending */}
-      <Card className="text-center">
+      <Card className="text-center" size="small">
         <Statistic
-          title="Total Group Spending"
+          title={<span className="text-xs sm:text-sm">Total Group Spending</span>}
           value={totalAmount}
           prefix="₹"
-          valueStyle={{ color: "#3f8600", fontSize: "2rem" }}
+          valueStyle={{ color: "#3f8600", fontSize: "1.5rem" }}
           suffix={
-            <div className="text-sm text-gray-500 mt-2">
+            <div className="text-xs text-gray-500 mt-1">
               across {expenses.length} transaction
               {expenses.length !== 1 ? "s" : ""}
             </div>
@@ -94,9 +94,10 @@ const TotalTab = () => {
 
       {/* Spending by Person */}
       <Card
+        size="small"
         title={
-          <div className="flex items-center text-sm md:text-xl">
-            <DollarOutlined className="mr-2 " />
+          <div className="flex items-center text-xs sm:text-sm">
+            <DollarOutlined className="mr-2" />
             Amount Paid by Each Person
           </div>
         }
@@ -109,13 +110,13 @@ const TotalTab = () => {
               .sort(([, a], [, b]) => b - a) // Sort by amount descending
               .map(([person, amount], index, array) => (
                 <div key={person}>
-                  <div className="flex items-center justify-between py-4 px-2">
-                    <div className="flex items-center space-x-3">
-                      <Text strong className="text-base">
+                  <div className="flex items-center justify-between py-2 px-1">
+                    <div className="flex items-center space-x-2">
+                      <Text strong className="text-xs sm:text-sm">
                         {getDisplayName(memberNameUserIdMapping[person])}
                       </Text>
                     </div>
-                    <Text strong className="text-sm md:text-lg text-green-600">
+                    <Text strong className="text-xs sm:text-sm text-green-600">
                       ₹{amount.toFixed(2)}
                     </Text>
                   </div>
@@ -126,19 +127,19 @@ const TotalTab = () => {
         )}
       </Card>
       {/* Date-wise Spending */}
-      <Card title="Date-wise Spending Summary" className="!text-xl">
+      <Card size="small" title={<span className="text-xs sm:text-sm">Date-wise Spending Summary</span>}>
         {Object.keys(dateWiseSpend).length === 0 ? (
           <Empty description="No date information available" />
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {Object.entries(dateWiseSpend)
               .sort(([a], [b]) => new Date(b) - new Date(a)) // Sort by date descending
               .map(([date, amount]) => (
                 <div
                   key={date}
-                  className="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0"
+                  className="flex justify-between items-center py-1.5 border-b border-gray-100 last:border-b-0"
                 >
-                  <Text>
+                  <Text className="text-xs sm:text-sm">
                     {new Date(date).toLocaleDateString("en-IN", {
                       weekday: "short",
                       year: "numeric",
@@ -146,15 +147,15 @@ const TotalTab = () => {
                       day: "numeric",
                     })}
                   </Text>
-                  <Text strong className="text-green-600">
+                  <Text strong className="text-xs sm:text-sm text-green-600">
                     ₹{amount.toFixed(2)}
                   </Text>
                 </div>
               ))}
-            <div className="pt-3 border-t border-gray-200">
+            <div className="pt-2 border-t border-gray-200">
               <div className="flex justify-between items-center">
-                <Text strong>Total</Text>
-                <Text strong className="text-lg text-green-600">
+                <Text strong className="text-xs sm:text-sm">Total</Text>
+                <Text strong className="text-sm sm:text-base text-green-600">
                   ₹
                   {Object.values(dateWiseSpend)
                     .reduce((sum, amount) => sum + amount, 0)

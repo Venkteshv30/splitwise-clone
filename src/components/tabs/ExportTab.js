@@ -204,26 +204,28 @@ const ExportTab = () => {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="text-center mb-8">
-        <ExportOutlined className="text-6xl text-blue-500 mb-4" />
-        <Title level={3}>Export Group Data</Title>
-        <Text type="secondary" className="block">
+      <div className="text-center mb-4 sm:mb-6">
+        <ExportOutlined className="text-3xl sm:text-4xl text-blue-500 mb-2 sm:mb-3" />
+        <Text className="text-base sm:text-lg font-semibold block mb-1">
+          Export Group Data
+        </Text>
+        <Text type="secondary" className="text-xs sm:text-sm block">
           Download or share a complete summary of all group expenses and
           balances
         </Text>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {/* Export to Excel/CSV */}
-        <Card>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <FileExcelOutlined className="text-2xl text-green-600" />
+        <Card size="small">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center space-x-2 sm:space-x-3 flex-1">
+              <FileExcelOutlined className="text-lg sm:text-xl text-green-600" />
               <div>
-                <Title level={5} className="mb-1">
+                <Text strong className="text-xs sm:text-sm block mb-0.5">
                   Export to Excel/CSV
-                </Title>
-                <Text type="secondary" className="text-sm">
+                </Text>
+                <Text type="secondary" className="text-[10px] sm:text-xs">
                   Download detailed expenses and balances in CSV format
                 </Text>
               </div>
@@ -233,6 +235,8 @@ const ExportTab = () => {
               icon={<ExportOutlined />}
               onClick={handleExportToExcel}
               disabled={expenses.length === 0}
+              size="small"
+              className="text-xs sm:text-sm"
             >
               Download CSV
             </Button>
@@ -240,15 +244,15 @@ const ExportTab = () => {
         </Card>
 
         {/* Share Summary */}
-        <Card>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <ExportOutlined className="text-2xl text-blue-600" />
+        <Card size="small">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center space-x-2 sm:space-x-3 flex-1">
+              <ExportOutlined className="text-lg sm:text-xl text-blue-600" />
               <div>
-                <Title level={5} className="mb-1">
+                <Text strong className="text-xs sm:text-sm block mb-0.5">
                   Share Summary
-                </Title>
-                <Text type="secondary" className="text-sm">
+                </Text>
+                <Text type="secondary" className="text-[10px] sm:text-xs">
                   Share a quick summary via messaging apps or copy to clipboard
                 </Text>
               </div>
@@ -257,6 +261,8 @@ const ExportTab = () => {
               icon={<ExportOutlined />}
               onClick={handleShareSummary}
               disabled={expenses.length === 0}
+              size="small"
+              className="text-xs sm:text-sm"
             >
               Share
             </Button>
@@ -265,8 +271,8 @@ const ExportTab = () => {
       </div>
 
       {expenses.length === 0 && (
-        <div className="text-center mt-8 p-6 bg-gray-50 rounded-lg">
-          <Text type="secondary">
+        <div className="text-center mt-4 sm:mt-6 p-3 sm:p-4 bg-gray-50 rounded">
+          <Text type="secondary" className="text-xs sm:text-sm">
             No expenses to export yet. Add some expenses to enable export
             features.
           </Text>

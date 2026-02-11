@@ -224,68 +224,69 @@ const TransactionsTab = () => {
       <>
         <div className="max-w-2xl mx-auto">
           {/* Header */}
-          <div className="flex items-center mb-2 md:mb-6 p-1 md:p-4 border-b">
+          <div className="flex items-center mb-3 sm:mb-4 py-2 border-b">
             <Button
               type="text"
               icon={<ArrowLeftOutlined />}
               onClick={() => setSelectedExpense(null)}
-              className="mr-3"
+              className="mr-2"
+              size="small"
             />
-            <Title level={4} className="m-0">
+            <Text className="text-sm sm:text-base font-semibold m-0">
               Transaction Details
-            </Title>
+            </Text>
           </div>
 
           {/* Main Details */}
-          <div className="p-2 md:p-6">
-            <div className="text-center mb-2 md:mb-8">
-              <div className="text-3xl md:text-6xl mb-4">
+          <div className="py-3 sm:py-4">
+            <div className="text-center mb-4 sm:mb-6">
+              <div className="text-2xl sm:text-4xl mb-2 sm:mb-3">
                 {getExpenseIcon(selectedExpense.description)}
               </div>
-              <Title level={2} className="mb-0.5 md:mb-2 !text-xl md:text-xl">
+              <Text className="block text-base sm:text-lg font-semibold mb-1 sm:mb-2">
                 {selectedExpense.description}
-              </Title>
-              <Text className="text-md md:text-2xl text-green-600 font-semibold">
+              </Text>
+              <Text className="text-base sm:text-xl text-green-600 font-semibold">
                 ₹{selectedExpense.amount?.toFixed(2)}
               </Text>
             </div>
 
             {/* Paid By */}
-            <Card className="mb-2 md:mb-4" title="Paid By">
+            <Card className="mb-3 sm:mb-4" size="small" title={<span className="text-xs sm:text-sm">Paid By</span>}>
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Avatar icon={<UserOutlined />} />
-                  <Text strong>{getMemberName(selectedExpense.paidBy)}</Text>
+                <div className="flex items-center space-x-2">
+                  <Avatar size="small" icon={<UserOutlined />} />
+                  <Text strong className="text-xs sm:text-sm">{getMemberName(selectedExpense.paidBy)}</Text>
                 </div>
-                <Text className="text-lg">
+                <Text className="text-sm sm:text-base">
                   ₹{selectedExpense.amount?.toFixed(2)}
                 </Text>
               </div>
             </Card>
 
             {/* Split Details */}
-            <Card title="Split Between">
-              <div className="space-y-3">
+            <Card size="small" title={<span className="text-xs sm:text-sm">Split Between</span>}>
+              <div className="space-y-2">
                 {selectedExpense.sharedBy?.map((person) => (
                   <div
                     key={person}
                     className="flex items-center justify-between"
                   >
-                    <div className="flex items-center space-x-3">
-                      <Avatar icon={<UserOutlined />} />
-                      <Text strong>
+                    <div className="flex items-center space-x-2">
+                      <Avatar size="small" icon={<UserOutlined />} />
+                      <Text strong className="text-xs sm:text-sm">
                         {person === currentUser?.email
                           ? "You"
                           : getMemberName(person)}
                       </Text>
                     </div>
                     <div className="text-right">
-                      <Text className="text-lg">₹{shareAmount.toFixed(2)}</Text>
+                      <Text className="text-sm sm:text-base">₹{shareAmount.toFixed(2)}</Text>
                       {person === currentUser?.email && youBorrowed > 0 && (
-                        <div className="text-sm text-red-500">you borrowed</div>
+                        <div className="text-[10px] sm:text-xs text-red-500">you borrowed</div>
                       )}
                       {person === currentUser?.email && youLent > 0 && (
-                        <div className="text-sm text-green-500">you lent</div>
+                        <div className="text-[10px] sm:text-xs text-green-500">you lent</div>
                       )}
                     </div>
                   </div>
@@ -295,10 +296,10 @@ const TransactionsTab = () => {
 
             {/* Your Summary */}
             {(youLent > 0 || youBorrowed > 0) && (
-              <Card className="mt-4 bg-blue-50">
+              <Card className="mt-3 sm:mt-4 bg-blue-50" size="small">
                 <div className="text-center">
-                  <Text className="text-lg">Your Balance</Text>
-                  <div className="text-2xl font-semibold mt-2">
+                  <Text className="text-xs sm:text-sm">Your Balance</Text>
+                  <div className="text-base sm:text-lg font-semibold mt-1 sm:mt-2">
                     {youLent > 0 && (
                       <Text className="text-green-600">
                         +₹{youLent.toFixed(2)} (you lent)
@@ -315,11 +316,12 @@ const TransactionsTab = () => {
             )}
 
             {/* Actions */}
-            <div className="flex justify-center space-x-4 mt-8">
+            <div className="flex justify-center space-x-3 sm:space-x-4 mt-4 sm:mt-6">
               <Button
                 icon={<EditOutlined />}
                 onClick={() => handleEdit(selectedExpense)}
-                size="large"
+                size="small"
+                className="text-xs sm:text-sm"
               >
                 Edit
               </Button>
@@ -327,7 +329,8 @@ const TransactionsTab = () => {
                 icon={<DeleteOutlined />}
                 danger
                 onClick={() => handleDelete(selectedExpense.id)}
-                size="large"
+                size="small"
+                className="text-xs sm:text-sm"
               >
                 Delete
               </Button>
@@ -437,19 +440,19 @@ const TransactionsTab = () => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {sortedDates.map((dateKey) => (
         <div key={dateKey}>
           {/* Date Header */}
-          <div className="flex flex-col items-center mb-4">
-            <Title level={5} className="text-gray-600 m-0 mr-4">
+          <div className="flex flex-col items-center mb-2">
+            <Text className="text-gray-600 m-0 text-xs sm:text-sm font-medium">
               {formatDate(dateKey)}
-            </Title>
-            <Divider className="flex-1 m-0" />
+            </Text>
+            <Divider className="flex-1 m-0 mt-1" />
           </div>
 
           {/* Expenses for this date */}
-          <div className="space-y-3  md:text-xs">
+          <div className="space-y-2">
             {groupedExpenses[dateKey].map((expense) => {
               const { month, day } = getDateParts(expense);
               const { youLent, youBorrowed } = calculateAmounts(expense);
@@ -458,21 +461,21 @@ const TransactionsTab = () => {
               return (
                 <div
                   key={expense.id}
-                  className="flex items-center p-1 md:p-4 bg-white rounded-lg border   cursor-pointer"
+                  className="flex items-center py-2 px-2 sm:px-3 bg-white rounded cursor-pointer hover:bg-gray-50 transition-colors"
                   onClick={() => setSelectedExpense(expense)}
                 >
                   {/* Date Column */}
-                  <div className="text-center mr-1 md:mr-4 min-w-[26px] md:min-w-[50px]">
-                    <div className="text-[10px] md:text-sm text-gray-500 uppercase">
+                  <div className="text-center mr-2 sm:mr-3 min-w-[24px] sm:min-w-[40px]">
+                    <div className="text-[9px] sm:text-[10px] text-gray-500 uppercase leading-tight">
                       {month}
                     </div>
-                    <div className="text-sm md:text-xl font-semibold">
+                    <div className="text-xs sm:text-sm font-semibold leading-tight">
                       {day}
                     </div>
                   </div>
 
                   {/* Icon */}
-                  <div className=" size-6 md:size-12 bg-gray-100 rounded-full flex items-center justify-center text-xl mr-4">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 rounded-full flex items-center justify-center text-sm sm:text-base mr-2 sm:mr-3 flex-shrink-0">
                     {getExpenseIcon(expense.description)}
                   </div>
 
@@ -480,11 +483,11 @@ const TransactionsTab = () => {
                   <div className="flex-1 min-w-0">
                     <Text
                       strong
-                      className="block text-base truncate text-[11px] md:text-sm"
+                      className="block truncate text-xs sm:text-sm font-medium"
                     >
                       {expense.description}
                     </Text>
-                    <Text type="secondary" className="text-[10px] md:text-sm">
+                    <Text type="secondary" className="text-[10px] sm:text-xs">
                       {isPaidByCurrentUser
                         ? `You paid ₹${expense.amount?.toFixed(2)}`
                         : `${getMemberName(
@@ -494,31 +497,31 @@ const TransactionsTab = () => {
                   </div>
 
                   {/* Amount Column */}
-                  <div className="text-right min-w-[80px]">
+                  <div className="text-right min-w-[70px] sm:min-w-[80px] flex-shrink-0">
                     {youLent > 0 && (
                       <>
-                        <div className="text-xs text-gray-500">you lent</div>
-                        <div className="text-[12px] md:text-lg  font-semibold text-green-600">
+                        <div className="text-[10px] sm:text-xs text-gray-500 leading-tight">you lent</div>
+                        <div className="text-xs sm:text-sm font-semibold text-green-600 leading-tight">
                           ₹{youLent.toFixed(2)}
                         </div>
                       </>
                     )}
                     {youBorrowed > 0 && (
                       <>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-[10px] sm:text-xs text-gray-500 leading-tight">
                           you borrowed
                         </div>
-                        <div className="text-[12px] md:text-lg font-semibold text-red-600">
+                        <div className="text-xs sm:text-sm font-semibold text-red-600 leading-tight">
                           ₹{youBorrowed.toFixed(2)}
                         </div>
                       </>
                     )}
                     {youLent === 0 && youBorrowed === 0 && (
                       <>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-[10px] sm:text-xs text-gray-500 leading-tight">
                           not involved
                         </div>
-                        <div className="text-lg font-semibold text-gray-400">
+                        <div className="text-xs sm:text-sm font-semibold text-gray-400 leading-tight">
                           ₹0.00
                         </div>
                       </>
