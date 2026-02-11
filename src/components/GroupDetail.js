@@ -27,9 +27,9 @@ const GroupDetail = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
+    <div className="max-w-6xl mx-auto h-full flex flex-col overflow-hidden">
+      {/* Header - Fixed */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0 flex-shrink-0">
         <div>
           <Button
             type="link"
@@ -56,27 +56,37 @@ const GroupDetail = () => {
         </Button>
       </div>
 
-      {/* Tabs */}
-      <div className="bg-white rounded-lg shadow-sm">
+      {/* Tabs - Fixed Header, Scrollable Content */}
+      <div className="bg-white rounded-lg shadow-sm flex flex-col flex-1 min-h-0 overflow-hidden">
         <Tabs
           defaultActiveKey="transactions"
-          className="p-2 md:p-4"
+          className="group-detail-tabs"
           type="card"
         >
           <TabPane tab="Transactions" key="transactions">
-            <TransactionsTab />
+            <div className="tab-content-scrollable">
+              <TransactionsTab />
+            </div>
           </TabPane>
           <TabPane tab="Total" key="total">
-            <TotalTab />
+            <div className="tab-content-scrollable">
+              <TotalTab />
+            </div>
           </TabPane>
           <TabPane tab="Balances" key="balances">
-            <BalancesTab />
+            <div className="tab-content-scrollable">
+              <BalancesTab />
+            </div>
           </TabPane>
           <TabPane tab="Members" key="members">
-            <MembersTab />
+            <div className="tab-content-scrollable">
+              <MembersTab />
+            </div>
           </TabPane>
           <TabPane tab="Export" key="export">
-            <ExportTab />
+            <div className="tab-content-scrollable">
+              <ExportTab />
+            </div>
           </TabPane>
         </Tabs>
       </div>
