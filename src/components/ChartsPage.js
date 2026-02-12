@@ -9,6 +9,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { useAppContext } from "../contexts/AppContext";
+import { useTheme } from "../contexts/ThemeContext";
 import { useExpenses } from "../hooks/useFirestore";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
@@ -30,8 +31,21 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+// Tooltip colors that work in both themes (Recharts may render outside themed tree)
+const TOOLTIP_DARK = {
+  bg: "hsl(0 0% 8%)",
+  border: "hsl(0 0% 18%)",
+  text: "hsl(0 0% 98%)",
+};
+const TOOLTIP_LIGHT = {
+  bg: "hsl(0 0% 100%)",
+  border: "hsl(214 32% 91%)",
+  text: "hsl(222 47% 11%)",
+};
+
 const ChartsPage = () => {
   const { selectedGroup, setCurrentPage } = useAppContext();
+  const { isDark } = useTheme();
   const { expenses, loading } = useExpenses(selectedGroup?.id);
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth : 1024
@@ -296,10 +310,13 @@ const ChartsPage = () => {
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
+                      backgroundColor: isDark ? TOOLTIP_DARK.bg : TOOLTIP_LIGHT.bg,
+                      border: `1px solid ${isDark ? TOOLTIP_DARK.border : TOOLTIP_LIGHT.border}`,
                       borderRadius: "6px",
+                      color: isDark ? TOOLTIP_DARK.text : TOOLTIP_LIGHT.text,
                     }}
+                    itemStyle={{ color: isDark ? TOOLTIP_DARK.text : TOOLTIP_LIGHT.text }}
+                    labelStyle={{ color: isDark ? TOOLTIP_DARK.text : TOOLTIP_LIGHT.text }}
                     formatter={(value) => [`₹${value}`, "Amount"]}
                   />
                   <Line
@@ -365,14 +382,33 @@ const ChartsPage = () => {
                       ))}
                     </Pie>
                     <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--card))",
-                        border: "1px solid hsl(var(--border))",
-                        borderRadius: "6px",
-                        fontSize: "12px",
+                      content={({ active, payload, label }) => {
+                        if (!active || !payload?.length) return null;
+                        const t = isDark ? TOOLTIP_DARK : TOOLTIP_LIGHT;
+                        const value = payload[0]?.value;
+                        const displayLabel = label != null ? `Category: ${label}` : "Amount";
+                        return (
+                          <div
+                            style={{
+                              backgroundColor: t.bg,
+                              border: `1px solid ${t.border}`,
+                              borderRadius: "6px",
+                              padding: "8px 12px",
+                              fontSize: "12px",
+                              color: t.text,
+                            }}
+                          >
+                            {label != null && (
+                              <div style={{ marginBottom: "4px", color: t.text }}>
+                                {displayLabel}
+                              </div>
+                            )}
+                            <div style={{ color: t.text, fontWeight: 500 }}>
+                              Amount : ₹{typeof value === "number" ? value.toFixed(2) : value}
+                            </div>
+                          </div>
+                        );
                       }}
-                      formatter={(value) => [`₹${value.toFixed(2)}`, "Amount"]}
-                      labelFormatter={(name) => `Category: ${name}`}
                     />
                     <Legend
                       verticalAlign="bottom"
@@ -442,10 +478,13 @@ const ChartsPage = () => {
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
+                      backgroundColor: isDark ? TOOLTIP_DARK.bg : TOOLTIP_LIGHT.bg,
+                      border: `1px solid ${isDark ? TOOLTIP_DARK.border : TOOLTIP_LIGHT.border}`,
                       borderRadius: "6px",
+                      color: isDark ? TOOLTIP_DARK.text : TOOLTIP_LIGHT.text,
                     }}
+                    itemStyle={{ color: isDark ? TOOLTIP_DARK.text : TOOLTIP_LIGHT.text }}
+                    labelStyle={{ color: isDark ? TOOLTIP_DARK.text : TOOLTIP_LIGHT.text }}
                     formatter={(value) => [`₹${value}`, "Amount"]}
                   />
                   <Bar
@@ -507,10 +546,13 @@ const ChartsPage = () => {
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
+                      backgroundColor: isDark ? TOOLTIP_DARK.bg : TOOLTIP_LIGHT.bg,
+                      border: `1px solid ${isDark ? TOOLTIP_DARK.border : TOOLTIP_LIGHT.border}`,
                       borderRadius: "6px",
+                      color: isDark ? TOOLTIP_DARK.text : TOOLTIP_LIGHT.text,
                     }}
+                    itemStyle={{ color: isDark ? TOOLTIP_DARK.text : TOOLTIP_LIGHT.text }}
+                    labelStyle={{ color: isDark ? TOOLTIP_DARK.text : TOOLTIP_LIGHT.text }}
                     formatter={(value) => [`₹${value}`, "Amount"]}
                   />
                   <Area

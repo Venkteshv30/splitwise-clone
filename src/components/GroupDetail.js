@@ -1,6 +1,16 @@
 // components/GroupDetail.js
 import React, { useState } from "react";
-import { ArrowLeft, Settings, Users, Plus, Calculator, DollarSign, User, Download, BarChart3 } from "lucide-react";
+import {
+  ArrowLeft,
+  Settings,
+  Users,
+  Plus,
+  Calculator,
+  DollarSign,
+  User,
+  Download,
+  BarChart3,
+} from "lucide-react";
 import { useAppContext } from "../contexts/AppContext";
 import TransactionsTab from "./tabs/TransactionsTab";
 import { Button } from "./ui/button";
@@ -23,7 +33,9 @@ const GroupDetail = () => {
   const [groupName, setGroupName] = useState("");
   const { updateGroup } = useGroups(currentUser?.email);
 
-  const isCreator = selectedGroup?.createdBy === currentUser?.email || selectedGroup?.creator === currentUser?.email;
+  const isCreator =
+    selectedGroup?.createdBy === currentUser?.email ||
+    selectedGroup?.creator === currentUser?.email;
 
   const handleEditGroupName = () => {
     setGroupName(selectedGroup.name);
@@ -42,27 +54,33 @@ const GroupDetail = () => {
   if (!selectedGroup) {
     return (
       <div className="text-center py-8">
-        <h3 className="text-lg font-semibold text-foreground mb-4">No group selected</h3>
-        <Button onClick={() => setCurrentPage("groups")}>
-          Go to Groups
-        </Button>
+        <h3 className="text-lg font-semibold text-foreground mb-4">
+          No group selected
+        </h3>
+        <Button onClick={() => setCurrentPage("groups")}>Go to Groups</Button>
       </div>
     );
   }
 
   // Use saved avatar colors or generate new ones
-  const avatarStyle = selectedGroup.avatarColor && selectedGroup.avatarPattern
-    ? {
-        backgroundColor: selectedGroup.avatarColor,
-        patternColor: selectedGroup.avatarPattern,
-      }
-    : generateGroupAvatar(selectedGroup.name);
+  const avatarStyle =
+    selectedGroup.avatarColor && selectedGroup.avatarPattern
+      ? {
+          backgroundColor: selectedGroup.avatarColor,
+          patternColor: selectedGroup.avatarPattern,
+        }
+      : generateGroupAvatar(selectedGroup.name);
 
   const navigationButtons = [
     { key: "total", label: "Total", icon: DollarSign, page: "totalPage" },
-    { key: "balances", label: "Balances", icon: Calculator, page: "balancesPage" },
-    { key: "members", label: "Members", icon: User, page: "membersPage" },
+    {
+      key: "balances",
+      label: "Balances",
+      icon: Calculator,
+      page: "balancesPage",
+    },
     { key: "charts", label: "Charts", icon: BarChart3, page: "chartsPage" },
+    { key: "members", label: "Members", icon: User, page: "membersPage" },
     { key: "export", label: "Export", icon: Download, page: "exportPage" },
   ];
 
@@ -103,7 +121,8 @@ const GroupDetail = () => {
               <div className="inline-flex items-center space-x-1 px-2 py-0.5 bg-muted rounded-full">
                 <Users className="h-3 w-3 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">
-                  {selectedGroup.members?.length || 0} {selectedGroup.members?.length === 1 ? "person" : "people"}
+                  {selectedGroup.members?.length || 0}{" "}
+                  {selectedGroup.members?.length === 1 ? "person" : "people"}
                 </span>
               </div>
             </div>
@@ -180,16 +199,10 @@ const GroupDetail = () => {
             </div>
           </div>
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowEditDialog(false)}
-            >
+            <Button variant="outline" onClick={() => setShowEditDialog(false)}>
               Cancel
             </Button>
-            <Button
-              onClick={handleSaveGroupName}
-              disabled={!groupName.trim()}
-            >
+            <Button onClick={handleSaveGroupName} disabled={!groupName.trim()}>
               Save
             </Button>
           </DialogFooter>

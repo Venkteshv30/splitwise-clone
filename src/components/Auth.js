@@ -25,7 +25,7 @@ const Auth = () => {
         await createUserWithEmailAndPassword(
           auth,
           values.email,
-          values.password
+          values.password,
         );
         message.success("Account created successfully!");
       }
@@ -50,14 +50,15 @@ const Auth = () => {
     }
   };
 
+  // Always white theme (no theme vars); theme switch only in Profile
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-lg border-border bg-card">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-lg border border-gray-200 !bg-white">
         <div className="text-center mb-6">
-          <Title level={2} className="text-foreground mb-2">
+          <Title level={2} className="!text-gray-900 mb-2">
             💰 SplitWise
           </Title>
-          <Text type="secondary" className="text-muted-foreground">
+          <Text type="secondary" className="!text-gray-600">
             {isLogin ? "Welcome back!" : "Create your account"}
           </Text>
         </div>
@@ -65,10 +66,10 @@ const Auth = () => {
         <button
           onClick={handleGoogleAuth}
           disabled={loading}
-          className="w-full bg-card border-2 border-border rounded-lg px-4 py-3 text-foreground font-medium hover:bg-accent hover:border-foreground/20 focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all duration-200 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-white border-2 border-gray-300 rounded-lg px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-700"></div>
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600"></div>
           ) : (
             <>
               <svg className="w-5 h-5" viewBox="0 0 24 24">

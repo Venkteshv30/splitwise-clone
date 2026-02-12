@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { Calculator } from "lucide-react";
 
+// Always white theme (no theme context); theme switch only in Profile.
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -21,31 +22,30 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 flex flex-col justify-center items-center p-4">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-black opacity-10"></div>
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center p-4">
+      {/* Subtle pattern */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 opacity-[0.4]"
         style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)`,
-          backgroundSize: "20px 20px",
+          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(0,0,0,0.06) 1px, transparent 0)`,
+          backgroundSize: "24px 24px",
         }}
-      ></div>
+      />
 
       <div className="relative z-10 w-full max-w-md">
         {/* Logo and Title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4 shadow-lg">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4 shadow-md border border-gray-100">
             <Calculator className="text-blue-600" size={32} />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Splitwise Clone
           </h1>
-          <p className="text-blue-100">Share expenses with friends & family</p>
+          <p className="text-gray-600">Share expenses with friends & family</p>
         </div>
 
         {/* Login Card */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
           <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
             Welcome Back
           </h2>
@@ -62,7 +62,7 @@ const Login = () => {
             className="w-full bg-white border-2 border-gray-300 rounded-lg px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-700"></div>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600"></div>
             ) : (
               <>
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -97,7 +97,7 @@ const Login = () => {
         </div>
 
         {/* Features */}
-        <div className="mt-8 text-center text-blue-100">
+        <div className="mt-8 text-center text-gray-600">
           <p className="text-sm mb-4">✨ Features you'll love:</p>
           <div className="grid grid-cols-2 gap-4 text-xs">
             <div className="flex items-center justify-center space-x-2">
