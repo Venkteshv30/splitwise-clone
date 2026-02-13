@@ -63,10 +63,16 @@ const TransactionDetailPage = () => {
     sharedBy: [],
   });
 
-  const getExpenseIcon = (description) => {
+  const getExpenseIcon = (description, large = false) => {
     const { icon } = getCategoryFromDescription(description);
     const IconComponent = CATEGORY_ICONS[icon] || Receipt;
-    return <IconComponent className="h-4 w-4" />;
+    return (
+      <IconComponent
+        className={large ? "h-10 w-10" : "h-5 w-5"}
+        strokeWidth={2.5}
+        aria-hidden
+      />
+    );
   };
 
   const getMemberName = (email) => {
@@ -151,6 +157,9 @@ const TransactionDetailPage = () => {
 
   const { youLent, youBorrowed, shareAmount } =
     calculateAmounts(selectedExpense);
+  const isCurrentUserInExpense =
+    selectedExpense.paidBy === currentUser?.email ||
+    selectedExpense.sharedBy?.includes(currentUser?.email);
 
   return (
     <div className="max-w-6xl mx-auto h-full flex flex-col overflow-hidden px-4 sm:px-6">
@@ -175,8 +184,8 @@ const TransactionDetailPage = () => {
           {/* Main Details */}
           <div className="py-4">
             <div className="text-center mb-6">
-              <div className="text-4xl mb-3">
-                {getExpenseIcon(selectedExpense.description)}
+              <div className="mb-3 flex justify-center">
+                {getExpenseIcon(selectedExpense.description, true)}
               </div>
               <h2 className="text-lg font-semibold mb-2 text-foreground">
                 {selectedExpense.description}
@@ -257,7 +266,7 @@ const TransactionDetailPage = () => {
               </CardContent>
             </Card>
 
-            {(youLent > 0 || youBorrowed > 0) && (
+            {(youLent > 0 || youBorrowed > 0 || isCurrentUserInExpense) && (
               <Card className="mb-4 bg-muted/30 border-border">
                 <CardContent className="pt-6">
                   <div className="text-center">
@@ -273,6 +282,11 @@ const TransactionDetailPage = () => {
                       {youBorrowed > 0 && (
                         <p className="text-red-400">
                           -₹{youBorrowed.toFixed(2)} (you borrowed)
+                        </p>
+                      )}
+                      {youLent === 0 && youBorrowed === 0 && isCurrentUserInExpense && (
+                        <p className="text-muted-foreground">
+                          ₹{selectedExpense.amount?.toFixed(2)} (paid to self)
                         </p>
                       )}
                     </div>

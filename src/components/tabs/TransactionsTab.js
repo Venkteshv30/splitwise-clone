@@ -75,7 +75,7 @@ const TransactionsTab = () => {
     const shareAmount = expense.amount / expense.sharedBy?.length || 1;
     const isCurrentUserPayer = expense.paidBy === currentUser?.email;
     const isCurrentUserInvolved = expense.sharedBy?.includes(
-      currentUser?.email
+      currentUser?.email,
     );
 
     let youLent = 0;
@@ -149,6 +149,9 @@ const TransactionsTab = () => {
                 const { youLent, youBorrowed } = calculateAmounts(expense);
                 const isPaidByCurrentUser =
                   expense.paidBy === currentUser?.email;
+                const isCurrentUserInExpense =
+                  isPaidByCurrentUser ||
+                  expense.sharedBy?.includes(currentUser?.email);
 
                 return (
                   <div
@@ -185,7 +188,7 @@ const TransactionsTab = () => {
                         {isPaidByCurrentUser
                           ? `You paid ₹${expense.amount?.toFixed(2)}`
                           : `${getMemberName(
-                              expense.paidBy
+                              expense.paidBy,
                             )} paid ₹${expense.amount?.toFixed(2)}`}
                       </p>
                     </div>
@@ -215,10 +218,15 @@ const TransactionsTab = () => {
                       {youLent === 0 && youBorrowed === 0 && (
                         <>
                           <div className="text-[9px] text-muted-foreground leading-tight">
-                            not involved
+                            {isCurrentUserInExpense
+                              ? "paid to self"
+                              : "not involved"}
                           </div>
                           <div className="text-xs font-semibold text-muted-foreground leading-tight">
-                            ₹0.00
+                            ₹
+                            {isCurrentUserInExpense
+                              ? expense.amount?.toFixed(2)
+                              : "0.00"}
                           </div>
                         </>
                       )}
@@ -229,7 +237,6 @@ const TransactionsTab = () => {
           </div>
         </div>
       ))}
-
     </div>
   );
 };
