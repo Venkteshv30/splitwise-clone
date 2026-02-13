@@ -21,6 +21,7 @@ export const AppProvider = ({ children }) => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [currentPage, setCurrentPage] = useState("groups");
   const [editingExpense, setEditingExpense] = useState(null);
+  const [selectedExpense, setSelectedExpense] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -45,6 +46,8 @@ export const AppProvider = ({ children }) => {
     setCurrentPage,
     editingExpense,
     setEditingExpense,
+    selectedExpense,
+    setSelectedExpense,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

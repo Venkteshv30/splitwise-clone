@@ -17,8 +17,8 @@ import BalancesPage from "./components/BalancesPage";
 import MembersPage from "./components/MembersPage";
 import ChartsPage from "./components/ChartsPage";
 import ExportPage from "./components/ExportPage";
+import TransactionDetailPage from "./components/TransactionDetailPage";
 import { Button } from "./components/ui/button";
-import { cn } from "./lib/utils";
 
 // Main Content Router Component
 const MainContent = () => {
@@ -45,6 +45,8 @@ const MainContent = () => {
       return <ChartsPage />;
     case "exportPage":
       return <ExportPage />;
+    case "transactionDetail":
+      return <TransactionDetailPage />;
     default:
       return <GroupsList />;
   }
@@ -162,11 +164,11 @@ const AppLayout = () => {
       )}
 
       {/* Main Content */}
-      <div 
-        style={{ 
+      <div
+        style={{
           marginLeft: 0,
-          height: '100vh', 
-          overflow: 'hidden'
+          height: "100vh",
+          overflow: "hidden",
         }}
         className="md:ml-16"
       >

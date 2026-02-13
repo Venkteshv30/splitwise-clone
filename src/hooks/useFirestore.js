@@ -25,13 +25,12 @@ export const useGroups = (userIdentifier) => {
       return;
     }
 
-    console.log("userIdentifier ", userIdentifier);
     const groupsRef = collection(db, "groups");
 
     // Use memberIds array for efficient querying
     const q = query(
       groupsRef,
-      where("memberIds", "array-contains", userIdentifier)
+      where("memberIds", "array-contains", userIdentifier),
     );
 
     const unsubscribe = onSnapshot(
@@ -43,13 +42,12 @@ export const useGroups = (userIdentifier) => {
         }));
         setGroups(groupsData);
         setLoading(false);
-        console.log("Groups fetched:", groupsData);
       },
       (error) => {
         console.error("Error fetching groups:", error);
         message.error("Failed to fetch groups. Please check your permissions.");
         setLoading(false);
-      }
+      },
     );
 
     return unsubscribe;
@@ -121,7 +119,7 @@ export const useExpenses = (groupId) => {
     const q = query(
       expensesRef,
       where("groupId", "==", groupId),
-      orderBy("createdAt", "desc")
+      orderBy("createdAt", "desc"),
     );
 
     const unsubscribe = onSnapshot(
@@ -137,10 +135,10 @@ export const useExpenses = (groupId) => {
       (error) => {
         console.error("Error fetching expenses:", error);
         message.error(
-          "Failed to fetch expenses. Please check your permissions."
+          "Failed to fetch expenses. Please check your permissions.",
         );
         setLoading(false);
-      }
+      },
     );
 
     return unsubscribe;
@@ -223,7 +221,7 @@ export const useMembers = (groupId) => {
         console.error("Error fetching members:", error);
         message.error("Failed to load members");
         setLoading(false);
-      }
+      },
     );
 
     return () => unsubscribe();
