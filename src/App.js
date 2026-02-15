@@ -18,6 +18,7 @@ import MembersPage from "./components/MembersPage";
 import ChartsPage from "./components/ChartsPage";
 import ExportPage from "./components/ExportPage";
 import TransactionDetailPage from "./components/TransactionDetailPage";
+import SettlementDetailPage from "./components/SettlementDetailPage";
 import { Button } from "./components/ui/button";
 
 // Main Content Router Component
@@ -47,6 +48,8 @@ const MainContent = () => {
       return <ExportPage />;
     case "transactionDetail":
       return <TransactionDetailPage />;
+    case "settlementDetail":
+      return <SettlementDetailPage />;
     default:
       return <GroupsList />;
   }

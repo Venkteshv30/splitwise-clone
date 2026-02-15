@@ -232,3 +232,87 @@ export const useMembers = (groupId) => {
     loading,
   };
 };
+
+// Hook for managing settlements (settle-up payments between members)
+export const useSettlements = (groupId) => {
+  const [settlements, setSettlements] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!groupId) {
+      setSettlements([]);
+      setLoading(false);
+      return;
+    }
+
+    const settlementsRef = collection(db, "settlements");
+    const q = query(
+      settlementsRef,
+      where("groupId", "==", groupId),
+      orderBy("createdAt", "desc"),
+    );
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const data = snapshot.docs.map((docSnap) => ({
+          id: docSnap.id,
+          ...docSnap.data(),
+        }));
+        setSettlements(data);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Error fetching settlements:", error);
+        message.error("Failed to fetch settlements.");
+        setLoading(false);
+      },
+    );
+
+    return unsubscribe;
+  }, [groupId]);
+
+  const addSettlement = async (data) => {
+    try {
+      await addDoc(collection(db, "settlements"), {
+        ...data,
+        groupId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      message.success("Settle up recorded");
+    } catch (error) {
+      console.error("Error adding settlement:", error);
+      message.error(`Failed to record settlement: ${error.message}`);
+      throw error;
+    }
+  };
+
+  const updateSettlement = async (settlementId, updates) => {
+    try {
+      const ref = doc(db, "settlements", settlementId);
+      await updateDoc(ref, {
+        ...updates,
+        updatedAt: new Date(),
+      });
+      message.success("Settlement updated");
+    } catch (error) {
+      console.error("Error updating settlement:", error);
+      message.error(`Failed to update settlement: ${error.message}`);
+      throw error;
+    }
+  };
+
+  const deleteSettlement = async (settlementId) => {
+    try {
+      await deleteDoc(doc(db, "settlements", settlementId));
+      message.success("Settlement deleted");
+    } catch (error) {
+      console.error("Error deleting settlement:", error);
+      message.error(`Failed to delete settlement: ${error.message}`);
+      throw error;
+    }
+  };
+
+  return { settlements, loading, addSettlement, updateSettlement, deleteSettlement };
+};

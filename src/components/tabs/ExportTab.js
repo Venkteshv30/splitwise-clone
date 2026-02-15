@@ -2,7 +2,8 @@
 import React from "react";
 import { Download, FileSpreadsheet, Share2, Loader2 } from "lucide-react";
 import { useAppContext } from "../../contexts/AppContext";
-import { useExpenses } from "../../hooks/useFirestore";
+import { useExpenses, useSettlements } from "../../hooks/useFirestore";
+import { computeBalances } from "../../utils/balanceUtils";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { cn } from "../../lib/utils";
@@ -10,43 +11,12 @@ import { cn } from "../../lib/utils";
 const ExportTab = () => {
   const { selectedGroup } = useAppContext();
   const { expenses, loading } = useExpenses(selectedGroup?.id);
+  const { settlements } = useSettlements(selectedGroup?.id);
   const [isExporting, setIsExporting] = React.useState(false);
   const [isSharing, setIsSharing] = React.useState(false);
 
-  // Function to prepare data for export
   const prepareExportData = () => {
-    // Calculate balances
-    const balances = {};
-    selectedGroup?.members?.forEach((member) => {
-      balances[member.user_id] = {
-        paid: 0,
-        owes: 0,
-        balance: 0,
-        name: member?.name,
-      };
-    });
-
-    expenses.forEach((expense) => {
-      if (!expense.amount || !expense.paidBy || !expense.sharedBy) return;
-
-      const shareAmount = expense.amount / expense.sharedBy.length;
-
-      // Add to paid amount for the single payer
-      if (balances[expense.paidBy]) {
-        balances[expense.paidBy].paid += expense.amount;
-      }
-
-      // Add to owes amount for sharers
-      expense.sharedBy.forEach((sharer) => {
-        if (balances[sharer]) {
-          balances[sharer].owes += shareAmount;
-        }
-      });
-    });
-
-    Object.keys(balances).forEach((person) => {
-      balances[person].balance = balances[person].paid - balances[person].owes;
-    });
+    const balances = computeBalances(expenses, settlements, selectedGroup?.members);
 
     return {
       groupInfo: {
