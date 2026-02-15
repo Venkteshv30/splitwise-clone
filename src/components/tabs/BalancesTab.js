@@ -1,9 +1,18 @@
 // components/tabs/BalancesTab.js
 import React, { useState } from "react";
-import { Calculator, ArrowRight, Loader2, Banknote, History } from "lucide-react";
+import {
+  Calculator,
+  ArrowRight,
+  Loader2,
+  Banknote,
+  History,
+} from "lucide-react";
 import { useAppContext } from "../../contexts/AppContext";
 import { useExpenses, useSettlements } from "../../hooks/useFirestore";
-import { computeBalances, getCreditorsAndDebtors } from "../../utils/balanceUtils";
+import {
+  computeBalances,
+  getCreditorsAndDebtors,
+} from "../../utils/balanceUtils";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -27,9 +36,14 @@ import {
 import { cn } from "../../lib/utils";
 
 const BalancesTab = () => {
-  const { selectedGroup, currentUser, setCurrentPage, setSelectedSettlement } = useAppContext();
+  const { selectedGroup, currentUser, setCurrentPage, setSelectedSettlement } =
+    useAppContext();
   const { expenses, loading: expensesLoading } = useExpenses(selectedGroup?.id);
-  const { settlements, loading: settlementsLoading, addSettlement } = useSettlements(selectedGroup?.id);
+  const {
+    settlements,
+    loading: settlementsLoading,
+    addSettlement,
+  } = useSettlements(selectedGroup?.id);
   const [settleModalOpen, setSettleModalOpen] = useState(false);
   const [settleForm, setSettleForm] = useState({
     fromUserId: "",
@@ -42,13 +56,25 @@ const BalancesTab = () => {
   const members = selectedGroup?.members || [];
 
   const balances = computeBalances(expenses, settlements, members);
-  const { creditors, debtors, even: evenMembers } = getCreditorsAndDebtors(balances);
+  const {
+    creditors,
+    debtors,
+    even: evenMembers,
+  } = getCreditorsAndDebtors(balances);
 
   // Suggested settlements (simplified debts) - who should pay whom
   const suggestedSettlements = (() => {
     const list = [];
-    let creditorsData = creditors.map(([id, b]) => ({ id, name: b.name, amount: b.balance }));
-    let debtorsData = debtors.map(([id, b]) => ({ id, name: b.name, amount: Math.abs(b.balance) }));
+    let creditorsData = creditors.map(([id, b]) => ({
+      id,
+      name: b.name,
+      amount: b.balance,
+    }));
+    let debtorsData = debtors.map(([id, b]) => ({
+      id,
+      name: b.name,
+      amount: Math.abs(b.balance),
+    }));
     while (creditorsData.length > 0 && debtorsData.length > 0) {
       const creditor = creditorsData[0];
       const debtor = debtorsData[0];
@@ -98,7 +124,11 @@ const BalancesTab = () => {
   const formatSettlementDate = (createdAt) => {
     if (!createdAt) return "";
     const d = createdAt?.toDate ? createdAt.toDate() : new Date(createdAt);
-    return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+    return d.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
   };
 
   if (loading) {
@@ -113,7 +143,9 @@ const BalancesTab = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
         <Calculator className="h-12 w-12 text-muted-foreground mb-4" />
-        <p className="text-sm text-muted-foreground">No members in this group</p>
+        <p className="text-sm text-muted-foreground">
+          No members in this group
+        </p>
       </div>
     );
   }
@@ -125,7 +157,9 @@ const BalancesTab = () => {
       <div className="space-y-4">
         <div className="flex flex-col items-center justify-center min-h-[40vh] text-center">
           <Calculator className="h-12 w-12 text-muted-foreground mb-4" />
-          <p className="text-sm text-muted-foreground mb-4">No expenses or settlements yet</p>
+          <p className="text-sm text-muted-foreground mb-4">
+            No expenses or settlements yet
+          </p>
           <Button onClick={() => setSettleModalOpen(true)} className="gap-2">
             <Banknote className="h-4 w-4" />
             Settle up
@@ -147,7 +181,12 @@ const BalancesTab = () => {
     <div className="space-y-4">
       {/* Settle up button */}
       <div className="flex justify-center">
-        <Button onClick={() => setSettleModalOpen(true)} variant="outline" size="sm" className="gap-2">
+        <Button
+          onClick={() => setSettleModalOpen(true)}
+          variant="outline"
+          size="sm"
+          className="gap-2"
+        >
           <Banknote className="h-4 w-4" />
           Settle up
         </Button>
@@ -181,21 +220,24 @@ const BalancesTab = () => {
                     balance.balance >= 0.01
                       ? "default"
                       : balance.balance <= -0.01
-                      ? "destructive"
-                      : "secondary"
+                        ? "destructive"
+                        : "secondary"
                   }
                   className={cn(
                     "text-[10px] sm:text-xs font-medium",
-                    balance.balance >= 0.01 && "bg-green-500/20 text-green-400 border-green-500/30",
-                    balance.balance <= -0.01 && "bg-red-500/20 text-red-400 border-red-500/30",
-                    Math.abs(balance.balance) <= 0.01 && "bg-muted text-muted-foreground"
+                    balance.balance >= 0.01 &&
+                      "bg-green-500/20 text-green-400 border-green-500/30",
+                    balance.balance <= -0.01 &&
+                      "bg-red-500/20 text-red-400 border-red-500/30",
+                    Math.abs(balance.balance) <= 0.01 &&
+                      "bg-muted text-muted-foreground",
                   )}
                 >
                   {balance.balance >= 0.01
                     ? "Gets back"
                     : balance.balance <= -0.01
-                    ? "Owes"
-                    : "Settled"}
+                      ? "Owes"
+                      : "Settled"}
                   {Math.abs(balance.balance) > 0.01 &&
                     ` ₹${Math.abs(balance.balance).toFixed(2)}`}
                 </Badge>
@@ -211,7 +253,9 @@ const BalancesTab = () => {
       </div>
       {suggestedSettlements.length === 0 ? (
         <div className="text-center py-4 sm:py-6">
-          <p className="text-base sm:text-lg text-green-400 block mb-1">🎉 All settled up!</p>
+          <p className="text-base sm:text-lg text-green-400 block mb-1">
+            🎉 All settled up!
+          </p>
           <p className="text-xs sm:text-sm text-muted-foreground">
             Everyone&apos;s expenses are balanced
           </p>
@@ -232,7 +276,10 @@ const BalancesTab = () => {
                   {s.toName || s.to.split("@")[0]}
                 </span>
               </div>
-              <Badge variant="outline" className="text-xs sm:text-sm font-medium border-border text-foreground">
+              <Badge
+                variant="outline"
+                className="text-xs sm:text-sm font-medium border-border text-foreground"
+              >
                 ₹{s.amount.toFixed(2)}
               </Badge>
             </div>
@@ -240,7 +287,8 @@ const BalancesTab = () => {
           <div className="border-t border-border my-2" />
           <p className="text-xs sm:text-sm text-muted-foreground text-center">
             With these {suggestedSettlements.length} transaction
-            {suggestedSettlements.length !== 1 ? "s" : ""}, everyone will be settled up!
+            {suggestedSettlements.length !== 1 ? "s" : ""}, everyone will be
+            settled up!
           </p>
         </div>
       )}
@@ -264,7 +312,8 @@ const BalancesTab = () => {
               >
                 <div className="flex items-center space-x-2 flex-1 min-w-0">
                   <span className="font-medium text-xs sm:text-sm text-foreground truncate">
-                    {getMemberName(s.fromUserId)} paid {getMemberName(s.toUserId)} ₹{Number(s.amount).toFixed(2)}
+                    {getMemberName(s.fromUserId)} paid{" "}
+                    {getMemberName(s.toUserId)} ₹{Number(s.amount).toFixed(2)}
                   </span>
                 </div>
                 <span className="text-[10px] sm:text-xs text-muted-foreground flex-shrink-0 ml-2">
@@ -284,16 +333,28 @@ const BalancesTab = () => {
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 text-center">
             <div className="p-2 sm:p-3 bg-green-500/10 rounded-lg border border-green-500/20">
-              <p className="text-green-400 block text-sm sm:text-base font-semibold">{creditors.length}</p>
-              <p className="text-xs sm:text-sm text-muted-foreground">Getting money back</p>
+              <p className="text-green-400 block text-sm sm:text-base font-semibold">
+                {creditors.length}
+              </p>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Getting money back
+              </p>
             </div>
             <div className="p-2 sm:p-3 bg-red-500/10 rounded-lg border border-red-500/20">
-              <p className="text-red-400 block text-sm sm:text-base font-semibold">{debtors.length}</p>
-              <p className="text-xs sm:text-sm text-muted-foreground">Owe money</p>
+              <p className="text-red-400 block text-sm sm:text-base font-semibold">
+                {debtors.length}
+              </p>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Owe money
+              </p>
             </div>
             <div className="p-2 sm:p-3 bg-muted rounded-lg border border-border">
-              <p className="text-muted-foreground block text-sm sm:text-base font-semibold">{evenMembers.length}</p>
-              <p className="text-xs sm:text-sm text-muted-foreground">All settled</p>
+              <p className="text-muted-foreground block text-sm sm:text-base font-semibold">
+                {evenMembers.length}
+              </p>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                All settled
+              </p>
             </div>
           </div>
         </CardContent>
@@ -311,9 +372,21 @@ const BalancesTab = () => {
   );
 };
 
-function SettleUpModal({ open, onOpenChange, settleForm, setSettleForm, members, onSubmit }) {
+function SettleUpModal({
+  open,
+  onOpenChange,
+  settleForm,
+  setSettleForm,
+  members,
+  onSubmit,
+}) {
   const amountNum = parseFloat(settleForm.amount);
-  const valid = settleForm.fromUserId && settleForm.toUserId && Number.isFinite(amountNum) && amountNum > 0 && settleForm.fromUserId !== settleForm.toUserId;
+  const valid =
+    settleForm.fromUserId &&
+    settleForm.toUserId &&
+    Number.isFinite(amountNum) &&
+    amountNum > 0 &&
+    settleForm.fromUserId !== settleForm.toUserId;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -321,7 +394,8 @@ function SettleUpModal({ open, onOpenChange, settleForm, setSettleForm, members,
         <DialogHeader>
           <DialogTitle>Settle up</DialogTitle>
           <DialogDescription>
-            Record a payment from one member to another. This updates everyone&apos;s balance.
+            Record a payment from one member to another. This updates
+            everyone&apos;s balance.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4 py-2">
@@ -329,7 +403,9 @@ function SettleUpModal({ open, onOpenChange, settleForm, setSettleForm, members,
             <Label>Who paid?</Label>
             <Select
               value={settleForm.fromUserId}
-              onValueChange={(v) => setSettleForm((f) => ({ ...f, fromUserId: v }))}
+              onValueChange={(v) =>
+                setSettleForm((f) => ({ ...f, fromUserId: v }))
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select member" />
@@ -347,7 +423,9 @@ function SettleUpModal({ open, onOpenChange, settleForm, setSettleForm, members,
             <Label>Who received?</Label>
             <Select
               value={settleForm.toUserId}
-              onValueChange={(v) => setSettleForm((f) => ({ ...f, toUserId: v }))}
+              onValueChange={(v) =>
+                setSettleForm((f) => ({ ...f, toUserId: v }))
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select member" />
@@ -369,19 +447,27 @@ function SettleUpModal({ open, onOpenChange, settleForm, setSettleForm, members,
               step="0.01"
               placeholder="0.00"
               value={settleForm.amount}
-              onChange={(e) => setSettleForm((f) => ({ ...f, amount: e.target.value }))}
+              onChange={(e) =>
+                setSettleForm((f) => ({ ...f, amount: e.target.value }))
+              }
             />
           </div>
           <div className="space-y-2">
-            <Label className="text-muted-foreground">Note (optional)</Label>
+            <Label className="text-muted-foreground">Note</Label>
             <Input
               placeholder="e.g. Cash, UPI"
               value={settleForm.note}
-              onChange={(e) => setSettleForm((f) => ({ ...f, note: e.target.value }))}
+              onChange={(e) =>
+                setSettleForm((f) => ({ ...f, note: e.target.value }))
+              }
             />
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
             <Button type="submit" disabled={!valid}>
